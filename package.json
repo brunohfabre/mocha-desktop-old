@@ -1,6 +1,6 @@
 {
   "name": "mocha",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "An simple project management application.",
   "main": "./out/main/index.js",
   "author": "coddee.com.br",

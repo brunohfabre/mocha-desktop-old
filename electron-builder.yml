@@ -1,5 +1,5 @@
-appId: com.electron.app
-productName: mocha-desktop
+appId: br.com.coddee.mocha
+productName: mocha
 directories:
   buildResources: build
 files:
@@ -11,9 +11,8 @@ files:
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
 asarUnpack:
   - resources/**
-afterSign: build/notarize.js
 win:
-  executableName: mocha-desktop
+  executableName: mocha
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
@@ -31,13 +30,10 @@ dmg:
 linux:
   target:
     - AppImage
-    - snap
+    - rpm
     - deb
-  maintainer: electronjs.org
+  maintainer: coddee.com.br
   category: Utility
 appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
-publish:
-  provider: generic
-  url: https://example.com/auto-updates

@@ -4,7 +4,7 @@
   "description": "An simple project management application.",
   "main": "./out/main/index.js",
   "author": "coddee.com.br",
-  "homepage": "https://www.mocha.coddee.com.br",
+  "homepage": "https://mocha.coddee.com.br",
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",

@@ -1,5 +1,5 @@
 appId: br.com.coddee.mocha
-productName: mocha
+productName: Mocha
 directories:
   buildResources: build
 files:

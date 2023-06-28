@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 
 import { Button } from '../../components/Button'
-import { Rectangle } from '../../components/Shimmer/Rectangle'
 import { api } from '../../lib/api'
 import { useProjectStore } from '../../stores/projectStore'
 import { CollectionCard } from './CollectionCard'

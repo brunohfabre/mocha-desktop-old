@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
-import _ from 'lodash'
+import { useQuery } from '@tanstack/react-query'
 
 import { Spinner } from '../../../components/Spinner'
 import { api } from '../../../lib/api'
@@ -40,45 +40,24 @@ export function Collection() {
   const selectRequest = useRequestStore((state) => state.selectRequest)
   const setResponseData = useResponseStore((state) => state.setResponseData)
 
-  const [collection, setCollection] = useState<CollectionType | null>(null)
-  const [loading, setLoading] = useState(false)
+  const { data: collection, isLoading: isCollectionLoading } = useQuery(
+    ['collections', collectionId],
+    async () => {
+      const response = await api.get(`/collections/${collectionId}`)
+
+      return response.data.collection
+    },
+    {
+      refetchOnWindowFocus: false,
+    },
+  )
 
   useEffect(() => {
     selectRequest(null)
     setResponseData(null)
   }, [selectRequest, setResponseData])
 
-  useEffect(() => {
-    async function loadCollection() {
-      try {
-        setLoading(true)
-
-        const response = await api.get(`/collections/${collectionId}`)
-
-        setCollection(response.data.collection)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    loadCollection()
-  }, [collectionId])
-
-  async function updateRequest(data: RequestType) {
-    if (!_.isEqual(requestSelected, data)) {
-      try {
-        setLoading(true)
-
-        await api.put(`/requests/${data.id}`, data)
-
-        selectRequest(data)
-      } finally {
-        setLoading(false)
-      }
-    }
-  }
-
-  if (!collection && loading) {
+  if (!collection && isCollectionLoading) {
     return (
       <div className="flex-1 flex flex-col gap-6 p-4">
         <div className="bg-zinc-200 h-8 w-56 animate-pulse" />
@@ -103,11 +82,11 @@ export function Collection() {
       <CreateFolderModal />
 
       <div className="flex-1 flex overflow-auto">
-        <Sidebar collection={collection!} isLoading={loading} />
+        <Sidebar collection={collection!} />
 
         {requestSelected ? (
           <>
-            <Request updateRequest={updateRequest} />
+            <Request />
 
             {responseLoading ? (
               <div className="flex-1 flex items-center justify-center">

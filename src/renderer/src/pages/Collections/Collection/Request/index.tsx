@@ -1,13 +1,16 @@
 import { useCallback, useEffect } from 'react'
 import { useForm, FormProvider } from 'react-hook-form'
+import { useParams } from 'react-router-dom'
 
 import axios from 'axios'
 import _ from 'lodash'
 import { z } from 'zod'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
 
 import { Button } from '../../../../components/Button'
+import { api } from '../../../../lib/api'
 import { Select } from '../../../../components/Select'
 import { Tabs } from '../../../../components/Tabs'
 import { TextInput } from '../../../../components/TextInput'
@@ -44,27 +47,38 @@ const requestFormSchema = z.object({
 
 type RequestFormData = z.infer<typeof requestFormSchema>
 
-interface RequestProps {
-  updateRequest: (data: RequestType) => void
-}
+export function Request() {
+  const { collectionId } = useParams<{
+    collectionId: string
+  }>()
 
-export function Request({ updateRequest }: RequestProps) {
+  const queryClient = useQueryClient()
+
   const requestSelected = useRequestStore((state) => state.request)
   const setResponseLoading = useResponseStore(
     (state) => state.setResponseLoading,
   )
   const setResponseData = useResponseStore((state) => state.setResponseData)
+  const selectRequest = useRequestStore((state) => state.selectRequest)
 
   const collectionForm = useForm<RequestFormData>({
     resolver: zodResolver(requestFormSchema),
   })
   const { handleSubmit, reset, watch } = collectionForm
 
-  useEffect(() => {
-    if (requestSelected) {
-      reset(requestSelected)
+  async function updateRequest(data: RequestType) {
+    if (!_.isEqual(requestSelected, data)) {
+      try {
+        console.log(true)
+
+        await api.put(`/requests/${data.id}`, data)
+
+        selectRequest(data)
+      } finally {
+        console.log(false)
+      }
     }
-  }, [reset, requestSelected])
+  }
 
   const debounceRequest = useCallback(
     _.debounce((nextValue) => updateRequest(nextValue), 750),
@@ -72,14 +86,30 @@ export function Request({ updateRequest }: RequestProps) {
   )
 
   useEffect(() => {
-    const subscription = watch((data) => {
+    if (requestSelected) {
+      reset(requestSelected)
+    }
+  }, [reset, requestSelected])
+
+  useEffect(() => {
+    const subscription = watch((data: any) => {
       debounceRequest(data)
+
+      queryClient.setQueryData(
+        ['collections', collectionId],
+        (prevState: any) => ({
+          ...prevState,
+          requests: prevState.requests.map((request: RequestType) =>
+            request.id === data.id ? data : request,
+          ),
+        }),
+      )
     })
 
     return () => {
       subscription.unsubscribe()
     }
-  }, [watch, debounceRequest])
+  }, [watch, debounceRequest, collectionId, queryClient])
 
   async function sendRequest(data: RequestFormData) {
     try {

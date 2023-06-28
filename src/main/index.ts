@@ -1,8 +1,12 @@
 import { app, shell, BrowserWindow } from 'electron'
-import path from 'path'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import icon from '../../resources/icon.png?asset'
 import { createFileRoute, createURLRoute } from 'electron-router-dom'
+import path from 'path'
+
+import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+
+import icon from '../../resources/icon.png?asset'
+
+import './ipc'
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({

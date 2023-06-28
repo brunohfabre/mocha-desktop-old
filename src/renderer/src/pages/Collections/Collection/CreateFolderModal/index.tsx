@@ -51,6 +51,7 @@ export function CreateFolderModal() {
         name,
         type: 'FOLDER',
         parentId: visible,
+        method: null,
       })
 
       queryClient.setQueryData(

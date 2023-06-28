@@ -15,10 +15,9 @@ import { Request } from './Request'
 
 interface SidebarProps {
   collection: CollectionType
-  isLoading: boolean
 }
 
-export function Sidebar({ collection, isLoading }: SidebarProps) {
+export function Sidebar({ collection }: SidebarProps) {
   const changeCreateRequestModalVisibility = useCreateRequestModalStore(
     (state) => state.changeVisibility,
   )
@@ -50,7 +49,7 @@ export function Sidebar({ collection, isLoading }: SidebarProps) {
           <div className="flex-1 flex items-center gap-2">
             <span className="text-sm">{collection?.name} </span>
 
-            {isLoading && <Spinner />}
+            {false && <Spinner />}
           </div>
 
           <IconButton type="button" size="sm">

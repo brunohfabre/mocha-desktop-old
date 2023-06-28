@@ -28,8 +28,21 @@ export function Collections() {
 
   if (!collections && isCollectionsLoading) {
     return (
-      <div>
-        <Rectangle />
+      <div className="flex flex-col p-4 gap-4">
+        <div className="flex justify-between items-center">
+          <div className="bg-zinc-200 h-6 w-32 animate-pulse" />
+
+          <div className="bg-zinc-200 h-10 w-32 animate-pulse" />
+        </div>
+
+        <div className="grid grid-cols-4 gap-2">
+          {new Array(7).fill('').map((_, index) => (
+            <div
+              key={String(index)}
+              className="bg-zinc-200 h-16 animate-pulse"
+            />
+          ))}
+        </div>
       </div>
     )
   }

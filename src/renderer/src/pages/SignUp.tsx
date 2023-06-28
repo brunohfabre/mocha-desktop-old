@@ -1,16 +1,19 @@
-import { useNavigate } from 'react-router-dom'
-import { Button } from '../components/Button'
-import { FormProvider, useForm } from 'react-hook-form'
-import { TextInput } from '../components/TextInput'
-import { PasswordInput } from '../components/PasswordInput'
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { MaskInput } from '../components/MaskInput'
-import { IconButton } from '../components/IconButton'
-import { CaretLeft } from '@phosphor-icons/react'
-import { LinkButton } from '../components/LinkButton'
-import { api } from '../lib/api'
 import { useState } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
+
+import { z } from 'zod'
+
+import { zodResolver } from '@hookform/resolvers/zod'
+import { CaretLeft } from '@phosphor-icons/react'
+
+import { Button } from '../components/Button'
+import { IconButton } from '../components/IconButton'
+import { LinkButton } from '../components/LinkButton'
+import { MaskInput } from '../components/MaskInput'
+import { PasswordInput } from '../components/PasswordInput'
+import { TextInput } from '../components/TextInput'
+import { api } from '../lib/api'
 import { useAuthStore } from '../stores/authStore'
 
 const signUpFormSchema = z
@@ -123,10 +126,30 @@ export function SignUp() {
 
       <footer className="flex p-4 justify-center">
         <span className="text-xs text-zinc-500 max-w-lg text-center">
-          By clicking “Sign up” above, you acknowledge that you have read and
-          understood, and agree to Mocha&apos;s{' '}
-          <LinkButton to="/terms-and-conditions">Terms & Conditions</LinkButton>{' '}
-          and <LinkButton to="/privacy-policy">Privacy Policy</LinkButton>.
+          By clicking “Continue with Github/Email” above, you acknowledge that
+          you have read and understood, and agree to Mocha&apos;s{' '}
+          <a
+            className="text-emerald-400 cursor-pointer hover:text-emerald-500"
+            onClick={() =>
+              window.api.openInBrowser({
+                url: 'https://mocha.coddee.com.br/terms-and-conditions',
+              })
+            }
+          >
+            Terms & Conditions
+          </a>{' '}
+          and{' '}
+          <a
+            className="text-emerald-400 cursor-pointer hover:text-emerald-500"
+            onClick={() =>
+              window.api.openInBrowser({
+                url: 'https://mocha.coddee.com.br/privacy-policy',
+              })
+            }
+          >
+            Privacy Policy
+          </a>
+          .
         </span>
       </footer>
     </div>

@@ -21,12 +21,12 @@ interface RequestProps {
 export function Request({ request }: RequestProps) {
   const queryClient = useQueryClient()
 
-  const { collectionId, requestId } = useParams<{
+  const { collectionId } = useParams<{
     collectionId: string
-    requestId: string
   }>()
 
   const selectRequest = useRequestStore((state) => state.selectRequest)
+  const requestSelected = useRequestStore((state) => state.request)
   const setResponseData = useResponseStore((state) => state.setResponseData)
 
   const [deleteRequestAlertVisible, setDeleteRequestAlertVisible] =
@@ -49,7 +49,7 @@ export function Request({ request }: RequestProps) {
         }),
       )
 
-      if (request.id === requestId) {
+      if (request.id === requestSelected?.id) {
         selectRequest(null)
         setResponseData(null)
       }

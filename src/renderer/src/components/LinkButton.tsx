@@ -1,5 +1,6 @@
-import clsx from 'clsx'
 import { Link, LinkProps } from 'react-router-dom'
+
+import clsx from 'clsx'
 
 export function LinkButton({ className, ...props }: LinkProps) {
   return (

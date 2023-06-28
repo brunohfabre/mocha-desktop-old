@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 import { z } from 'zod'
 
@@ -11,6 +11,7 @@ import { Button } from '../../../../components/Button'
 import { Modal } from '../../../../components/Modal'
 import { TextInput } from '../../../../components/TextInput'
 import { api } from '../../../../lib/api'
+import { useRequestStore } from '../stores/requestStore'
 import { useCreateRequestModalStore } from './createRequestModalStore'
 
 const createRequestFormSchema = z.object({
@@ -21,7 +22,6 @@ type CreateRequestFormData = z.infer<typeof createRequestFormSchema>
 
 export function CreateRequestModal() {
   const queryClient = useQueryClient()
-  const navigate = useNavigate()
 
   const { collectionId } = useParams<{ collectionId: string }>()
 
@@ -34,6 +34,7 @@ export function CreateRequestModal() {
   const changeVisibility = useCreateRequestModalStore(
     (state) => state.changeVisibility,
   )
+  const selectRequest = useRequestStore((state) => state.selectRequest)
 
   const [loading, setLoading] = useState(false)
 
@@ -64,9 +65,7 @@ export function CreateRequestModal() {
       )
 
       handleCloseModal()
-      navigate(`/collections/${collectionId}/${response.data.request.id}`, {
-        replace: true,
-      })
+      selectRequest(response.data.request)
     } finally {
       setLoading(false)
     }

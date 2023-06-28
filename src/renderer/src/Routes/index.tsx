@@ -10,11 +10,9 @@ import { Home } from '../pages/Home'
 import { Organizations } from '../pages/Organizations'
 import { CreateOrganization } from '../pages/Organizations/CreateOrganization'
 import { Organization } from '../pages/Organizations/Organization'
-import { PrivacyPolicy } from '../pages/PrivacyPolicy'
 import { CreateProject } from '../pages/Projects/CreateProject'
 import { SignIn } from '../pages/SignIn'
 import { SignUp } from '../pages/SignUp'
-import { TermsAndConditions } from '../pages/TermsAndConditions'
 import { Protected } from './Protected'
 
 export function Routes() {
@@ -25,12 +23,6 @@ export function Routes() {
           <Route element={<AuthLayout />}>
             <Route path="/sign-in" element={<SignIn />} />
             <Route path="/sign-up" element={<SignUp />} />
-
-            <Route
-              path="/terms-and-conditions"
-              element={<TermsAndConditions />}
-            />
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           </Route>
 
           <Route element={<Protected />}>

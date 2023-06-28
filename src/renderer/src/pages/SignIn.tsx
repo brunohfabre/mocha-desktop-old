@@ -89,8 +89,28 @@ export function SignIn() {
         <span className="text-xs text-zinc-500 max-w-lg text-center">
           By clicking “Continue with Github/Email” above, you acknowledge that
           you have read and understood, and agree to Mocha&apos;s{' '}
-          <LinkButton to="/terms-and-conditions">Terms & Conditions</LinkButton>{' '}
-          and <LinkButton to="/privacy-policy">Privacy Policy</LinkButton>.
+          <a
+            className="text-emerald-400 cursor-pointer hover:text-emerald-500"
+            onClick={() =>
+              window.api.openInBrowser({
+                url: 'https://mocha.coddee.com.br/terms-and-conditions',
+              })
+            }
+          >
+            Terms & Conditions
+          </a>{' '}
+          and{' '}
+          <a
+            className="text-emerald-400 cursor-pointer hover:text-emerald-500"
+            onClick={() =>
+              window.api.openInBrowser({
+                url: 'https://mocha.coddee.com.br/privacy-policy',
+              })
+            }
+          >
+            Privacy Policy
+          </a>
+          .
         </span>
       </footer>
     </div>

@@ -16,18 +16,18 @@ type UserType = {
 
 type MemberType = {
   id: string
-  user_id: string
+  userId: string
   user: UserType
   role: string
-  accepted_at: string
-  created_at: string
+  acceptedAt: string
+  createdAt: string
 }
 
 type OrganizationType = {
   id: string
   name: string
   type: string
-  created_at: string
+  createdAt: string
   members: MemberType[]
 }
 
@@ -50,7 +50,7 @@ export function Organization() {
     })
 
   const isOwner = organization?.members.some(
-    (member) => member.user_id === user?.id && member.role === 'OWNER',
+    (member) => member.userId === user?.id && member.role === 'OWNER',
   )
 
   async function handleDelete() {

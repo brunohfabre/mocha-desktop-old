@@ -26,7 +26,7 @@ export function Sidebar({ collection }: SidebarProps) {
   )
 
   const content = collection?.requests.filter(
-    (request) => request.parentId === collection.request_id,
+    (request) => request.parentId === collection.requestId,
   )
 
   return (
@@ -65,7 +65,7 @@ export function Sidebar({ collection }: SidebarProps) {
                   <Button
                     type="button"
                     onClick={() =>
-                      changeCreateRequestModalVisibility(collection.request_id)
+                      changeCreateRequestModalVisibility(collection.requestId)
                     }
                   >
                     + Request
@@ -73,7 +73,7 @@ export function Sidebar({ collection }: SidebarProps) {
                   <Button
                     type="button"
                     onClick={() =>
-                      changeCreateFolderModalVisibility(collection.request_id)
+                      changeCreateFolderModalVisibility(collection.requestId)
                     }
                   >
                     + Folder
@@ -98,14 +98,14 @@ export function Sidebar({ collection }: SidebarProps) {
           <Context.Content>
             <Context.Item
               onClick={() =>
-                changeCreateRequestModalVisibility(collection.request_id)
+                changeCreateRequestModalVisibility(collection.requestId)
               }
             >
               Create request
             </Context.Item>
             <Context.Item
               onClick={() =>
-                changeCreateFolderModalVisibility(collection.request_id)
+                changeCreateFolderModalVisibility(collection.requestId)
               }
             >
               Create folder

@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 
-import { CaretDown } from '@phosphor-icons/react'
+import { CaretDown, Check } from '@phosphor-icons/react'
 import { useQueryClient } from '@tanstack/react-query'
 
 import { createUseOrganizationsKey } from '../../services/organizations/keys'
@@ -40,7 +40,10 @@ export function Organizations() {
         <div className="flex flex-col py-1">
           <div className="h-[1px] bg-zinc-400" />
         </div>
-        <Dropdown.Item>{organizationSelected?.name}</Dropdown.Item>
+        <Dropdown.Item className="justify-between">
+          {organizationSelected?.name}{' '}
+          {organizationSelected?.type === 'PERSONAL' && <Check weight="bold" />}
+        </Dropdown.Item>
 
         <div className="h-2" />
 
@@ -51,8 +54,12 @@ export function Organizations() {
           <div className="h-[1px] bg-zinc-400" />
         </div>
         {filteredOrganizations?.map((organization) => (
-          <Dropdown.Item key={organization.id}>
+          <Dropdown.Item key={organization.id} className="justify-between">
             {organization.name}
+
+            {organizationSelected?.id === organization.id && (
+              <Check weight="bold" />
+            )}
           </Dropdown.Item>
         ))}
         <Dropdown.Item onClick={() => navigate('/organizations/create')}>

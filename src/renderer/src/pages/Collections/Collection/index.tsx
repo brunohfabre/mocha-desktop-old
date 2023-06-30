@@ -24,8 +24,8 @@ export type RequestType = {
 export type CollectionType = {
   id: string
   name: string
-  project_id: string
-  request_id: string
+  projectId: string
+  requestId: string
   requests: RequestType[]
 }
 

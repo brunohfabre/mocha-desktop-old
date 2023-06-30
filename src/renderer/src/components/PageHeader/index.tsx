@@ -3,22 +3,29 @@ import { useNavigate } from 'react-router-dom'
 
 import { CaretDown, CaretLeft } from '@phosphor-icons/react'
 
-import { useAuthStore } from '../stores/authStore'
-import { useProjectStore } from '../stores/projectStore'
-import { Alert } from './Alert'
-import { Dropdown } from './Dropdown'
-import { IconButton } from './IconButton'
+import { useAuthStore } from '../../stores/authStore'
+import { useOrganizationStore } from '../../stores/organizationStore'
+import { Alert } from '../Alert'
+import { Dropdown } from '../Dropdown'
+import { IconButton } from '../IconButton'
+import { Organizations } from './Organizations'
 
 interface PageHeaderProps {
   showBackButton?: boolean
+  showOrganizations?: boolean
 }
 
-export function PageHeader({ showBackButton = true }: PageHeaderProps) {
+export function PageHeader({
+  showBackButton = true,
+  showOrganizations = true,
+}: PageHeaderProps) {
   const navigate = useNavigate()
 
   const user = useAuthStore((state) => state.user)
   const setCredentials = useAuthStore((state) => state.setCredentials)
-  const selectProject = useProjectStore((state) => state.selectProject)
+  const selectOrganization = useOrganizationStore(
+    (state) => state.selectOrganization,
+  )
 
   const [signOutAlertVisible, setSignOutAlertVisible] = useState(false)
 
@@ -28,7 +35,7 @@ export function PageHeader({ showBackButton = true }: PageHeaderProps) {
       user: null,
     })
 
-    selectProject(null)
+    selectOrganization(null)
   }
 
   return (
@@ -42,13 +49,20 @@ export function PageHeader({ showBackButton = true }: PageHeaderProps) {
         onAction={handleSignOut}
       />
 
-      <div className="flex h-12 bg-blue-200 items-center justify-between gap-4 px-2">
-        <div>
+      <div className="flex h-12 bg-blue-200 items-center justify-between gap-4 pr-2">
+        <div className="flex gap-2 items-center">
           {showBackButton && (
-            <IconButton type="button" size="sm" onClick={() => navigate(-1)}>
+            <IconButton
+              type="button"
+              size="sm"
+              onClick={() => navigate(-1)}
+              className="ml-2"
+            >
               <CaretLeft size={16} weight="bold" />
             </IconButton>
           )}
+
+          {showOrganizations && <Organizations />}
         </div>
 
         <Dropdown.Root>

@@ -69,7 +69,7 @@ export function SignUp() {
         user,
       })
 
-      navigate('/', {
+      navigate('/splash', {
         replace: true,
       })
     } finally {

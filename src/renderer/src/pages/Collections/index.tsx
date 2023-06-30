@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import { Button } from '../../components/Button'
 import { api } from '../../lib/api'
-import { useProjectStore } from '../../stores/projectStore'
+import { useOrganizationStore } from '../../stores/organizationStore'
 import { CollectionCard } from './CollectionCard'
 
 type CollectionType = {
@@ -15,12 +15,14 @@ type CollectionType = {
 export function Collections() {
   const navigate = useNavigate()
 
-  const project = useProjectStore((state) => state.project)
+  const organization = useOrganizationStore((state) => state.organization)
 
   const { data: collections, isLoading: isCollectionsLoading } = useQuery<
     CollectionType[]
   >(['collections'], async () => {
-    const response = await api.get(`/projects/${project?.id}/collections`)
+    const response = await api.get(
+      `/organizations/${organization?.id}/collections`,
+    )
 
     return response.data.collections
   })
@@ -47,19 +49,29 @@ export function Collections() {
   }
 
   return (
-    <div className="flex-1 flex flex-col">
-      <div className="flex justify-between items-center p-4">
-        <h1 className="font-semibold">Collections</h1>
+    <div className="flex-1 flex overflow-auto">
+      <div className="flex-1 flex flex-col max-w-7xl mx-auto p-4 gap-4">
+        <div className="flex justify-between items-center">
+          <h1 className="font-semibold">Collections</h1>
 
-        <Button type="button" onClick={() => navigate('/collections/create')}>
-          + New collection
-        </Button>
-      </div>
+          <Button type="button" onClick={() => navigate('/collections/create')}>
+            + New collection
+          </Button>
+        </div>
 
-      <div className="grid grid-cols-4 px-4 pb-4 gap-2">
-        {collections?.map((collection) => (
-          <CollectionCard key={collection.id} collection={collection} />
-        ))}
+        {!collections?.length && (
+          <div className="flex-1 flex flex-col items-center justify-center">
+            <p className="text-base font-semibold">No collections</p>
+          </div>
+        )}
+
+        {!!collections?.length && (
+          <div className="grid grid-cols-4 gap-4">
+            {collections?.map((collection) => (
+              <CollectionCard key={collection.id} collection={collection} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

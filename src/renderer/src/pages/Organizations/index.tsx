@@ -1,38 +1,26 @@
 import { useNavigate } from 'react-router-dom'
 
-import { CaretRight } from '@phosphor-icons/react'
-import { useQuery } from '@tanstack/react-query'
-
 import { Button } from '../../components/Button'
-import { Empty } from '../../components/Empty'
-import { IconButton } from '../../components/IconButton'
-import { api } from '../../lib/api'
-import { ProjectCard } from './ProjectCard'
-
-type ProjectType = {
-  id: string
-  name: string
-  organization_id: string
-}
-
-type OrganizationType = {
-  id: string
-  name: string
-  type: string
-  created_at: string
-  projects: ProjectType[]
-}
+import { useOrganizations } from '../../services/organizations'
+import { OrganizationType } from '../../services/organizations/types'
+import { useOrganizationStore } from '../../stores/organizationStore'
 
 export function Organizations() {
   const navigate = useNavigate()
 
-  const { data: organizations, isLoading: isOrganizationsLoading } = useQuery<
-    OrganizationType[]
-  >(['organizations'], async () => {
-    const response = await api.get('/projects')
+  const selectOrganization = useOrganizationStore(
+    (state) => state.selectOrganization,
+  )
 
-    return response.data.organizations
-  })
+  const { data: organizations, isLoading: isOrganizationsLoading } =
+    useOrganizations()
+
+  function handleSelectOrganization(organization: OrganizationType) {
+    selectOrganization(organization)
+    navigate('/', {
+      replace: true,
+    })
+  }
 
   if (!organizations && isOrganizationsLoading) {
     return (
@@ -55,61 +43,36 @@ export function Organizations() {
   }
 
   return (
-    <div className="flex-1 flex flex-col overflow-auto">
-      <div className="flex justify-between items-center p-4">
-        <h1 className="font-medium">Organizations</h1>
+    <div className="flex-1 flex overflow-auto">
+      <div className="flex-1 flex flex-col max-w-7xl mx-auto p-4 gap-4">
+        <div className="flex justify-between items-center">
+          <h1 className="text-base font-medium">Organizations</h1>
 
-        <Button onClick={() => navigate('/organizations/create')}>
-          + New organization
-        </Button>
-      </div>
+          <Button onClick={() => navigate('/organizations/create')}>
+            + New organization
+          </Button>
+        </div>
 
-      <div className="flex-1 overflow-auto px-4 pb-4 flex flex-col gap-8">
-        {organizations?.map((organization) => (
-          <div key={organization.id} className="flex flex-col gap-2">
-            <div className="flex items-center gap-4">
-              <p>{organization.name}</p>
-
-              <IconButton
-                type="button"
-                size="sm"
-                onClick={() => navigate(`/organizations/${organization.id}`)}
-              >
-                <CaretRight size={14} weight="bold" />
-              </IconButton>
-            </div>
-
-            {organization.projects.length ? (
-              <>
-                <div className="grid grid-cols-4 gap-2">
-                  {organization.projects.map((project) => (
-                    <ProjectCard key={project.id} project={project} />
-                  ))}
-
-                  <Button
-                    type="button"
-                    onClick={() =>
-                      navigate(
-                        `/organizations/${organization.id}/projects/create`,
-                      )
-                    }
-                  >
-                    + New project
-                  </Button>
-                </div>
-              </>
-            ) : (
-              <Empty
-                title="No projects"
-                description="Get started by creating a new project."
-                actionText="+ New project"
-                onAction={() =>
-                  navigate(`/organizations/${organization.id}/projects/create`)
-                }
-              />
-            )}
+        {!organizations?.length && (
+          <div className="flex-1 flex flex-col items-center justify-center">
+            <p className="text-base font-semibold">No organizations</p>
           </div>
-        ))}
+        )}
+
+        {!!organizations?.length && (
+          <div className="grid grid-cols-4 gap-4">
+            {organizations?.map((organization) => (
+              <button
+                key={organization.id}
+                type="button"
+                className="bg-zinc-200 h-32 flex p-4 text-sm hover:bg-zinc-300"
+                onClick={() => handleSelectOrganization(organization)}
+              >
+                {organization.name}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

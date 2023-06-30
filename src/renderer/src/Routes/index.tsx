@@ -10,9 +10,9 @@ import { Home } from '../pages/Home'
 import { Organizations } from '../pages/Organizations'
 import { CreateOrganization } from '../pages/Organizations/CreateOrganization'
 import { Organization } from '../pages/Organizations/Organization'
-import { CreateProject } from '../pages/Projects/CreateProject'
 import { SignIn } from '../pages/SignIn'
 import { SignUp } from '../pages/SignUp'
+import { Splash } from '../pages/Splash'
 import { Protected } from './Protected'
 
 export function Routes() {
@@ -26,6 +26,8 @@ export function Routes() {
           </Route>
 
           <Route element={<Protected />}>
+            <Route path="/splash" element={<Splash />} />
+
             <Route element={<DefaultLayout />}>
               <Route path="/" element={<Home />} />
 
@@ -39,11 +41,6 @@ export function Routes() {
               <Route
                 path="/organizations/create"
                 element={<CreateOrganization />}
-              />
-
-              <Route
-                path="/organizations/:id/projects/create"
-                element={<CreateProject />}
               />
 
               <Route

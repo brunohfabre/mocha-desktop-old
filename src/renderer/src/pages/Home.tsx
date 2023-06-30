@@ -1,13 +1,23 @@
-import { Navigate } from 'react-router-dom'
+import { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 
-import { useProjectStore } from '../stores/projectStore'
+import { useQueryClient } from '@tanstack/react-query'
+
+import { createUseOrganizationsKey } from '../services/organizations/keys'
 
 export function Home() {
-  const project = useProjectStore((state) => state.project)
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
 
-  if (!project) {
-    return <Navigate to="/organizations" replace />
-  }
+  useEffect(() => {
+    const organizations = queryClient.getQueryData(createUseOrganizationsKey())
+
+    if (!organizations) {
+      navigate('/splash', {
+        replace: true,
+      })
+    }
+  }, [navigate, queryClient])
 
   return (
     <div className="p-4">

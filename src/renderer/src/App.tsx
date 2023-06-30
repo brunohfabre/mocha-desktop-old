@@ -1,6 +1,8 @@
 import { Toaster } from 'react-hot-toast'
-import { Routes } from './Routes'
+
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
+
+import { Routes } from './Routes'
 
 import './styles/global.css'
 

@@ -1,6 +1,6 @@
-import { useFormContext, useFieldArray } from 'react-hook-form'
+import { useFormContext, useFieldArray, Controller } from 'react-hook-form'
 
-import { Trash } from '@phosphor-icons/react'
+import { Check, Trash } from '@phosphor-icons/react'
 
 import { Button } from '../../../../components/Button'
 import { IconButton } from '../../../../components/IconButton'
@@ -25,6 +25,7 @@ export function Headers() {
               append({
                 name: '',
                 value: '',
+                active: false,
               })
             }
           >
@@ -35,6 +36,18 @@ export function Headers() {
         <div className="flex flex-col gap-2">
           {fields.map((field, index) => (
             <div key={field.id} className="flex gap-2 items-end">
+              <Controller
+                name={`headers.${index}.active`}
+                render={({ field }) => (
+                  <button
+                    type="button"
+                    className="h-10 w-10 bg-blue-200 flex items-center justify-center"
+                    onClick={() => field.onChange(!field.value)}
+                  >
+                    {field.value && <Check size={18} weight="bold" />}
+                  </button>
+                )}
+              />
               <div className="flex-1">
                 <TextInput
                   name={`headers.${index}.name`}

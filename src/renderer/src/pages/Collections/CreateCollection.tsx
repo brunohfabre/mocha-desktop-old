@@ -10,7 +10,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '../../components/Button'
 import { TextInput } from '../../components/TextInput'
 import { api } from '../../lib/api'
-import { useProjectStore } from '../../stores/projectStore'
+import { useOrganizationStore } from '../../stores/organizationStore'
 
 const createCollectionFormSchema = z.object({
   name: z.string().nonempty(),
@@ -21,7 +21,7 @@ type CreateCollectionFormData = z.infer<typeof createCollectionFormSchema>
 export function CreateCollection() {
   const navigate = useNavigate()
 
-  const project = useProjectStore((state) => state.project)
+  const organization = useOrganizationStore((state) => state.organization)
 
   const queryClient = useQueryClient()
 
@@ -38,9 +38,12 @@ export function CreateCollection() {
 
       const { name } = data
 
-      const response = await api.post(`/projects/${project?.id}/collections`, {
-        name,
-      })
+      const response = await api.post(
+        `/organizations/${organization?.id}/collections`,
+        {
+          name,
+        },
+      )
 
       queryClient.setQueryData(['collections'], (prevState: any) => [
         ...prevState,
@@ -56,23 +59,25 @@ export function CreateCollection() {
   }
 
   return (
-    <div className="flex-1 flex flex-col gap-4">
-      <header className="p-4">
-        <h1 className="font-medium">New organization</h1>
-      </header>
+    <div className="flex-1 flex">
+      <div className="flex-1 flex flex-col max-w-xl mx-auto p-4 gap-4">
+        <header>
+          <h1 className="font-medium">New collection</h1>
+        </header>
 
-      <FormProvider {...createCollectionForm}>
-        <form
-          onSubmit={handleSubmit(createCollection)}
-          className="max-w-md w-full flex flex-col gap-8 self-center"
-        >
-          <TextInput name="name" label="Name" placeholder="Name" />
+        <FormProvider {...createCollectionForm}>
+          <form
+            onSubmit={handleSubmit(createCollection)}
+            className="w-full flex flex-col gap-8 self-center"
+          >
+            <TextInput name="name" label="Name" placeholder="Name" />
 
-          <div className="flex justify-end">
-            <Button isLoading={loading}>Create</Button>
-          </div>
-        </form>
-      </FormProvider>
+            <div className="flex justify-end">
+              <Button isLoading={loading}>Create</Button>
+            </div>
+          </form>
+        </FormProvider>
+      </div>
     </div>
   )
 }

@@ -117,7 +117,7 @@ export function Response() {
   const responseTime = formatTime(responseData?.time)
   const responseSize = formatBytes(
     encodeURI(JSON.stringify(responseData?.response.data)).split(/%..|./)
-      .length,
+      .length - 1,
   )
 
   return (

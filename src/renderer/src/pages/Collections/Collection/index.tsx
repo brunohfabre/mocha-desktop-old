@@ -98,7 +98,9 @@ export function Collection() {
                   <Response />
                 ) : (
                   <div className="flex-1 flex items-center justify-center">
-                    <span>To view response, send a request.</span>
+                    <span className="text-sm">
+                      To view response, send a request.
+                    </span>
                   </div>
                 )}
               </>

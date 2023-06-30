@@ -52,7 +52,7 @@ export function Sidebar({ collection }: SidebarProps) {
             {false && <Spinner />}
           </div>
 
-          <IconButton type="button" size="sm">
+          <IconButton type="button" size="sm" disabled>
             <DotsThree size={16} weight="bold" />
           </IconButton>
         </header>
@@ -113,10 +113,14 @@ export function Sidebar({ collection }: SidebarProps) {
           </Context.Content>
         </Context.Root>
 
-        <div className="flex h-10 bg-blue-100 items-center justify-between px-4">
+        <button
+          type="button"
+          className="flex h-10 bg-blue-100 items-center justify-between px-4 disabled:opacity-60 disabled:cursor-not-allowed"
+          disabled
+        >
           <span className="text-sm">Environment</span>
           <CaretDown size={16} weight="bold" />
-        </div>
+        </button>
       </div>
     </ResizableBox>
   )

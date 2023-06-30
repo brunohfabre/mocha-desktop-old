@@ -6,6 +6,7 @@ import { z } from 'zod'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 
+import GitHubMark from '../assets/github-mark.svg'
 import LogoLight from '../assets/logo-light.svg'
 import { Button } from '../components/Button'
 import { LinkButton } from '../components/LinkButton'
@@ -45,7 +46,7 @@ export function SignIn() {
 
       setCredentials({ token, user })
 
-      navigate('/', {
+      navigate('/splash', {
         replace: true,
       })
     } finally {
@@ -63,6 +64,19 @@ export function SignIn() {
 
       <div className="max-w-xs w-full self-center flex flex-col gap-8">
         <h1 className="text-3xl font-medium text-center">Sign in</h1>
+
+        <Button className="gap-2" disabled>
+          <img
+            src={GitHubMark}
+            alt="GitHub mark"
+            className="h-[18px] w-[18px]"
+          />
+          Continue with GitHub
+        </Button>
+
+        <div className="flex justify-center">
+          <span className="text-sm text-zinc-500">or</span>
+        </div>
 
         <FormProvider {...signInForm}>
           <form onSubmit={handleSubmit(signIn)} className="flex flex-col gap-8">

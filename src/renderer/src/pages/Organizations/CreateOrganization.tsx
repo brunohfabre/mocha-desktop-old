@@ -10,6 +10,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '../../components/Button'
 import { TextInput } from '../../components/TextInput'
 import { api } from '../../lib/api'
+import { createUseOrganizationsKey } from '../../services/organizations/keys'
 import { useOrganizationStore } from '../../stores/organizationStore'
 
 const createOrganizationSchema = z.object({
@@ -44,10 +45,16 @@ export function CreateOrganization() {
         name,
       })
 
-      queryClient.setQueryData(['organizations'], (prevState: any) => [
-        ...prevState,
-        response.data.organization,
-      ])
+      const organizations = queryClient.getQueryData(
+        createUseOrganizationsKey(),
+      )
+
+      if (organizations) {
+        queryClient.setQueryData(
+          createUseOrganizationsKey(),
+          (prevState: any) => [...prevState, response.data.organization],
+        )
+      }
 
       selectOrganization(response.data.organization)
 

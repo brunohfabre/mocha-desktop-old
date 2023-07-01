@@ -12,7 +12,6 @@ import { CreateOrganization } from '../pages/Organizations/CreateOrganization'
 import { Organization } from '../pages/Organizations/Organization'
 import { SignIn } from '../pages/SignIn'
 import { SignUp } from '../pages/SignUp'
-import { Splash } from '../pages/Splash'
 import { Protected } from './Protected'
 
 export function Routes() {
@@ -26,8 +25,6 @@ export function Routes() {
           </Route>
 
           <Route element={<Protected />}>
-            <Route path="/splash" element={<Splash />} />
-
             <Route element={<DefaultLayout />}>
               <Route path="/" element={<Home />} />
 

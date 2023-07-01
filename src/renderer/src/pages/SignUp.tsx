@@ -14,11 +14,24 @@ import { MaskInput } from '../components/MaskInput'
 import { PasswordInput } from '../components/PasswordInput'
 import { TextInput } from '../components/TextInput'
 import { api } from '../lib/api'
+import { OrganizationType } from '../services/organizations/types'
 import { useAuthStore } from '../stores/authStore'
+import { useOrganizationStore } from '../stores/organizationStore'
 
 const signUpFormSchema = z
   .object({
-    name: z.string().nonempty(),
+    name: z
+      .string()
+      .nonempty()
+      .transform((name) => {
+        return name
+          .trim()
+          .split(' ')
+          .map((word) => {
+            return word[0].toLocaleUpperCase().concat(word.substring(1))
+          })
+          .join(' ')
+      }),
     email: z.string().email().nonempty(),
     phone: z.string().nonempty(),
     password: z.string().min(6).nonempty(),
@@ -40,6 +53,9 @@ export function SignUp() {
   const navigate = useNavigate()
 
   const setCredentials = useAuthStore((state) => state.setCredentials)
+  const selectOrganization = useOrganizationStore(
+    (state) => state.selectOrganization,
+  )
 
   const signUpForm = useForm<SignUpFormData>({
     resolver: zodResolver(signUpFormSchema),
@@ -54,6 +70,8 @@ export function SignUp() {
 
       const { name, email, phone, password, confirmPassword } = data
 
+      console.log(name)
+
       const response = await api.post('/users', {
         name,
         email,
@@ -62,14 +80,22 @@ export function SignUp() {
         confirmPassword,
       })
 
-      const { token, user } = response.data
+      const { token, user, organizations } = response.data
 
       setCredentials({
         token,
         user,
       })
 
-      navigate('/splash', {
+      const findOrganization = organizations.find(
+        (organization: OrganizationType) => organization.type === 'PERSONAL',
+      )
+
+      if (findOrganization) {
+        selectOrganization(findOrganization)
+      }
+
+      navigate('/', {
         replace: true,
       })
     } finally {

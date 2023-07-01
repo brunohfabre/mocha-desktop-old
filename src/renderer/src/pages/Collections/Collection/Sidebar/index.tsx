@@ -36,7 +36,7 @@ export function Sidebar({ collection }: SidebarProps) {
       axis="x"
       resizeHandles={['e']}
       className="flex relative border-r border-red-500 z-[1]"
-      minConstraints={[16, Infinity]}
+      minConstraints={[192, Infinity]}
       maxConstraints={[640, Infinity]}
       handle={
         <div className="w-4 h-10 bg-violet-500 p-1.5 flex rounded-full absolute right-[-8px] top-[50%] translate-y-[-50%] cursor-ew-resize">

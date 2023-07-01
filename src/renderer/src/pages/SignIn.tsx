@@ -13,7 +13,9 @@ import { LinkButton } from '../components/LinkButton'
 import { PasswordInput } from '../components/PasswordInput'
 import { TextInput } from '../components/TextInput'
 import { api } from '../lib/api'
+import { OrganizationType } from '../services/organizations/types'
 import { useAuthStore } from '../stores/authStore'
+import { useOrganizationStore } from '../stores/organizationStore'
 
 const signInFormSchema = z.object({
   email: z.string().email().nonempty(),
@@ -26,6 +28,9 @@ export function SignIn() {
   const navigate = useNavigate()
 
   const setCredentials = useAuthStore((state) => state.setCredentials)
+  const selectOrganization = useOrganizationStore(
+    (state) => state.selectOrganization,
+  )
 
   const signInForm = useForm<SignInFormData>({
     resolver: zodResolver(signInFormSchema),
@@ -42,11 +47,19 @@ export function SignIn() {
 
       const response = await api.post('/sessions', { email, password })
 
-      const { token, user } = response.data
+      const { token, user, organizations } = response.data
 
       setCredentials({ token, user })
 
-      navigate('/splash', {
+      const findOrganization = organizations.find(
+        (organization: OrganizationType) => organization.type === 'PERSONAL',
+      )
+
+      if (findOrganization) {
+        selectOrganization(findOrganization)
+      }
+
+      navigate('/', {
         replace: true,
       })
     } finally {

@@ -1,23 +1,26 @@
 import { useNavigate } from 'react-router-dom'
 
 import { CaretDown, Check } from '@phosphor-icons/react'
-import { useQueryClient } from '@tanstack/react-query'
 
-import { createUseOrganizationsKey } from '../../services/organizations/keys'
-import { OrganizationType } from '../../services/organizations/types'
+import { useOrganizations } from '../../services/organizations'
 import { useOrganizationStore } from '../../stores/organizationStore'
 import { Dropdown } from '../Dropdown'
 
 export function Organizations() {
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
+
+  const { data: organizations, isLoading: isOrganizationsLoading } =
+    useOrganizations()
 
   const organizationSelected = useOrganizationStore(
     (state) => state.organization,
   )
+  const selectOrganization = useOrganizationStore(
+    (state) => state.selectOrganization,
+  )
 
-  const organizations = queryClient.getQueryData<OrganizationType[]>(
-    createUseOrganizationsKey(),
+  const personalOrganization = organizations?.find(
+    (organization) => organization.type === 'PERSONAL',
   )
   const filteredOrganizations = organizations?.filter(
     (organization) => organization.type !== 'PERSONAL',
@@ -34,41 +37,58 @@ export function Organizations() {
       </Dropdown.Trigger>
 
       <Dropdown.Content align="start">
-        <div className="text-xs h-8 flex items-center px-3 text-zinc-500">
-          Personal account
-        </div>
-        <div className="flex flex-col py-1">
-          <div className="h-[1px] bg-zinc-400" />
-        </div>
-        <Dropdown.Item className="justify-between">
-          {organizationSelected?.name}{' '}
-          {organizationSelected?.type === 'PERSONAL' && <Check weight="bold" />}
-        </Dropdown.Item>
+        {!organizations && isOrganizationsLoading ? (
+          <div className="h-64 flex items-center justify-center">
+            <text>is loading</text>
+          </div>
+        ) : (
+          <>
+            <div className="text-xs h-6 flex items-center px-3 text-zinc-500">
+              Personal account
+            </div>
+            <div className="flex flex-col py-1">
+              <div className="h-[1px] bg-zinc-400" />
+            </div>
+            <Dropdown.Item
+              className="justify-between"
+              onClick={() => selectOrganization(personalOrganization!)}
+            >
+              {personalOrganization?.name}{' '}
+              {personalOrganization?.id === organizationSelected?.id && (
+                <Check weight="bold" />
+              )}
+            </Dropdown.Item>
 
-        <div className="h-2" />
+            <div className="h-2" />
 
-        <div className="text-xs h-8 flex items-center px-3 text-zinc-500">
-          Organizations
-        </div>
-        <div className="flex flex-col py-1">
-          <div className="h-[1px] bg-zinc-400" />
-        </div>
-        {filteredOrganizations?.map((organization) => (
-          <Dropdown.Item key={organization.id} className="justify-between">
-            {organization.name}
+            <div className="text-xs h-6 flex items-center px-3 text-zinc-500">
+              Organizations
+            </div>
+            <div className="flex flex-col py-1">
+              <div className="h-[1px] bg-zinc-400" />
+            </div>
+            {filteredOrganizations?.map((organization) => (
+              <Dropdown.Item
+                key={organization.id}
+                className="justify-between"
+                onClick={() => selectOrganization(organization)}
+              >
+                {organization.name}
 
-            {organizationSelected?.id === organization.id && (
-              <Check weight="bold" />
-            )}
-          </Dropdown.Item>
-        ))}
-        <Dropdown.Item onClick={() => navigate('/organizations/create')}>
-          + New organization
-        </Dropdown.Item>
+                {organizationSelected?.id === organization.id && (
+                  <Check weight="bold" />
+                )}
+              </Dropdown.Item>
+            ))}
+            <Dropdown.Item onClick={() => navigate('/organizations/create')}>
+              + New organization
+            </Dropdown.Item>
 
-        <Dropdown.Item onClick={() => navigate('/organizations')}>
-          All organizations
-        </Dropdown.Item>
+            <Dropdown.Item onClick={() => navigate('/organizations')}>
+              All organizations
+            </Dropdown.Item>
+          </>
+        )}
       </Dropdown.Content>
     </Dropdown.Root>
   )

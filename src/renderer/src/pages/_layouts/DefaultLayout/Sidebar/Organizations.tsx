@@ -1,10 +1,9 @@
 import { useNavigate } from 'react-router-dom'
 
-import { CaretDown, Check } from '@phosphor-icons/react'
-
-import { useOrganizations } from '../../services/organizations'
-import { useOrganizationStore } from '../../stores/organizationStore'
-import { Dropdown } from '../Dropdown'
+import { Dropdown } from '@/components/Dropdown'
+import { useOrganizations } from '@/services/organizations'
+import { useOrganizationStore } from '@/stores/organizationStore'
+import { Check } from '@phosphor-icons/react'
 
 export function Organizations() {
   const navigate = useNavigate()
@@ -29,14 +28,14 @@ export function Organizations() {
   return (
     <Dropdown.Root>
       <Dropdown.Trigger>
-        <div className="h-12 px-4 flex items-center gap-2 cursor-pointer hover:bg-blue-300">
-          <span className="text-sm">{organizationSelected?.name}</span>
-
-          <CaretDown weight="bold" />
+        <div className="w-14 h-14 flex gap-2 items-center justify-center ursor-pointer bg-zinc-200 hover:bg-zinc-300">
+          <span className="text-base font-semibold">
+            {organizationSelected?.name[0]}
+          </span>
         </div>
       </Dropdown.Trigger>
 
-      <Dropdown.Content align="start">
+      <Dropdown.Content align="end">
         {!organizations && isOrganizationsLoading ? (
           <div className="h-64 flex items-center justify-center">
             <text>is loading</text>

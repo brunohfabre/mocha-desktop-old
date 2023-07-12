@@ -4,7 +4,9 @@ import { useNavigate } from 'react-router-dom'
 
 import { z } from 'zod'
 
+import { IconButton } from '@/components/IconButton'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { CaretLeft } from '@phosphor-icons/react'
 import { useQueryClient } from '@tanstack/react-query'
 
 import { Button } from '../../components/Button'
@@ -61,6 +63,11 @@ export function CreateCollection() {
   return (
     <div className="flex-1 flex">
       <div className="flex-1 flex flex-col max-w-xl mx-auto p-4 gap-4">
+        <div>
+          <IconButton size="sm" onClick={() => navigate(-1)}>
+            <CaretLeft weight="bold" />
+          </IconButton>
+        </div>
         <header>
           <h1 className="font-medium">New collection</h1>
         </header>

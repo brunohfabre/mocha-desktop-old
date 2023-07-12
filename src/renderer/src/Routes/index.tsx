@@ -29,6 +29,11 @@ export function Routes() {
               <Route path="/" element={<Home />} />
 
               <Route path="/collections" element={<Collections />} />
+
+              <Route
+                path="/collections/:collectionId"
+                element={<Collection />}
+              />
             </Route>
 
             <Route element={<InternalLayout />}>
@@ -43,10 +48,6 @@ export function Routes() {
               <Route
                 path="/collections/create"
                 element={<CreateCollection />}
-              />
-              <Route
-                path="/collections/:collectionId"
-                element={<Collection />}
               />
             </Route>
           </Route>

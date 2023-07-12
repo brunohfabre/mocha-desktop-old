@@ -1,5 +1,8 @@
 import { useNavigate } from 'react-router-dom'
 
+import { IconButton } from '@/components/IconButton'
+import { CaretLeft } from '@phosphor-icons/react'
+
 import { Button } from '../../components/Button'
 import { useOrganizations } from '../../services/organizations'
 import { OrganizationType } from '../../services/organizations/types'
@@ -46,7 +49,12 @@ export function Organizations() {
     <div className="flex-1 flex overflow-auto">
       <div className="flex-1 flex flex-col max-w-7xl mx-auto p-4 gap-4">
         <div className="flex justify-between items-center">
-          <h1 className="text-base font-medium">Organizations</h1>
+          <div className="flex items-center gap-2">
+            <IconButton size="sm" onClick={() => navigate(-1)}>
+              <CaretLeft />
+            </IconButton>
+            <h1 className="text-base font-medium">Organizations</h1>
+          </div>
 
           <Button onClick={() => navigate('/organizations/create')}>
             + New organization

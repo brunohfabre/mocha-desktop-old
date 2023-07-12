@@ -1,4 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron'
+import { platform } from 'os'
 
 import { ElectronAPI, electronAPI } from '@electron-toolkit/preload'
 
@@ -13,6 +14,7 @@ const api = {
   openInBrowser(params: { url: string }) {
     return ipcRenderer.send('open-in-browser', params)
   },
+  platform: platform(),
 }
 
 if (process.contextIsolated) {

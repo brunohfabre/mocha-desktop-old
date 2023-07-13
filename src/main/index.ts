@@ -1,4 +1,5 @@
-import { app, shell, BrowserWindow } from 'electron'
+import { app, shell, BrowserWindow, dialog } from 'electron'
+import { Deeplink } from 'electron-deeplink'
 import { createFileRoute, createURLRoute } from 'electron-router-dom'
 import path from 'path'
 
@@ -7,6 +8,8 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
 import './ipc'
+
+let deeplink
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
@@ -24,6 +27,21 @@ function createWindow(): void {
       preload: path.join(__dirname, '../preload/index.js'),
       sandbox: false,
     },
+  })
+
+  deeplink = new Deeplink({
+    app,
+    mainWindow,
+    protocol: 'mocha',
+    isDev: import.meta.env.DEV,
+  })
+
+  deeplink.on('received', (link) => {
+    console.log({ link })
+    // do stuff here
+    dialog.showMessageBox({
+      message: 'teste',
+    })
   })
 
   mainWindow.on('ready-to-show', () => {

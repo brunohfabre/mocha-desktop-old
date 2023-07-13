@@ -14,9 +14,6 @@ import { MaskInput } from '../components/MaskInput'
 import { PasswordInput } from '../components/PasswordInput'
 import { TextInput } from '../components/TextInput'
 import { api } from '../lib/api'
-import { OrganizationType } from '../services/organizations/types'
-import { useAuthStore } from '../stores/authStore'
-import { useOrganizationStore } from '../stores/organizationStore'
 
 const signUpFormSchema = z
   .object({
@@ -52,11 +49,6 @@ type SignUpFormData = z.infer<typeof signUpFormSchema>
 export function SignUp() {
   const navigate = useNavigate()
 
-  const setCredentials = useAuthStore((state) => state.setCredentials)
-  const selectOrganization = useOrganizationStore(
-    (state) => state.selectOrganization,
-  )
-
   const signUpForm = useForm<SignUpFormData>({
     resolver: zodResolver(signUpFormSchema),
   })
@@ -70,9 +62,7 @@ export function SignUp() {
 
       const { name, email, phone, password, confirmPassword } = data
 
-      console.log(name)
-
-      const response = await api.post('/users', {
+      await api.post('/users', {
         name,
         email,
         phone,
@@ -80,23 +70,25 @@ export function SignUp() {
         confirmPassword,
       })
 
-      const { token, user, organizations } = response.data
+      // const { token, user, organizations } = response.data
 
-      setCredentials({
-        token,
-        user,
-      })
+      // setCredentials({
+      //   token,
+      //   user,
+      // })
 
-      const findOrganization = organizations.find(
-        (organization: OrganizationType) => organization.type === 'PERSONAL',
-      )
+      // const findOrganization = organizations.find(
+      //   (organization: OrganizationType) => organization.type === 'PERSONAL',
+      // )
 
-      if (findOrganization) {
-        selectOrganization(findOrganization)
-      }
+      // if (findOrganization) {
+      //   selectOrganization(findOrganization)
+      // }
 
-      navigate('/', {
-        replace: true,
+      navigate('/code-verification', {
+        state: {
+          email,
+        },
       })
     } finally {
       setLoading(false)

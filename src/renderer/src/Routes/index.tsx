@@ -1,5 +1,7 @@
 import { Router, Route } from 'electron-router-dom'
 
+import { CodeVerification } from '@/pages/CodeVerification'
+
 import { AuthLayout } from '../pages/_layouts/AuthLayout'
 import { DefaultLayout } from '../pages/_layouts/DefaultLayout'
 import { InternalLayout } from '../pages/_layouts/InternalLayout'
@@ -22,6 +24,7 @@ export function Routes() {
           <Route element={<AuthLayout />}>
             <Route path="/sign-in" element={<SignIn />} />
             <Route path="/sign-up" element={<SignUp />} />
+            <Route path="/code-verification" element={<CodeVerification />} />
           </Route>
 
           <Route element={<Protected />}>

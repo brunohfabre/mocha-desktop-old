@@ -36,6 +36,7 @@ jobs:
         run: |
           touch .env
           echo RENDERER_VITE_API_URL=${{ secrets.RENDERER_VITE_API_URL }} >> .env
+          echo RENDERER_VITE_GITHUB_CLIENT_ID=${{ secrets.RENDERER_VITE_GITHUB_CLIENT_ID }} >> .env
           cat .env
 
       - name: Release Electron app

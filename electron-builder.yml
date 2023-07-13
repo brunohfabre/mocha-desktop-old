@@ -2,7 +2,7 @@ appId: br.com.coddee.mocha
 productName: Mocha
 protocols:
   name: mocha
-  schemas:
+  schemes:
     - 'mocha'
 directories:
   buildResources: build

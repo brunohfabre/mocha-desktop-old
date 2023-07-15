@@ -36,8 +36,6 @@ export function CodeVerification() {
 
   const [loading, setLoading] = useState(false)
 
-  console.log(location.state)
-
   async function signUp(data: CodeVerificationFormData) {
     try {
       setLoading(true)

@@ -1,9 +1,5 @@
 appId: br.com.coddee.mocha
 productName: Mocha
-protocols:
-  name: mocha
-  schemes:
-    - 'mocha'
 directories:
   buildResources: build
 files:

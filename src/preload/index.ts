@@ -14,6 +14,7 @@ const api = {
   openInBrowser(params: { url: string }) {
     return ipcRenderer.send('open-in-browser', params)
   },
+  onOauthToken: (callback: any) => ipcRenderer.on('oauth', callback),
   platform: platform(),
 }
 

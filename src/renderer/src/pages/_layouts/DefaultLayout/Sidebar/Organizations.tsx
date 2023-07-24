@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { Dropdown } from '@/components/Dropdown'
 import { useOrganizations } from '@/services/organizations'
+import { OrganizationType } from '@/services/organizations/types'
 import { useOrganizationStore } from '@/stores/organizationStore'
 import { Check } from '@phosphor-icons/react'
 
@@ -24,6 +25,12 @@ export function Organizations() {
   const filteredOrganizations = organizations?.filter(
     (organization) => organization.type !== 'PERSONAL',
   )
+
+  function handleSelectOrganiation(organization: OrganizationType) {
+    selectOrganization(organization)
+
+    navigate('/')
+  }
 
   return (
     <Dropdown.Root>
@@ -50,7 +57,7 @@ export function Organizations() {
             </div>
             <Dropdown.Item
               className="justify-between"
-              onClick={() => selectOrganization(personalOrganization!)}
+              onClick={() => handleSelectOrganiation(personalOrganization!)}
             >
               {personalOrganization?.name}{' '}
               {personalOrganization?.id === organizationSelected?.id && (
@@ -70,7 +77,7 @@ export function Organizations() {
               <Dropdown.Item
                 key={organization.id}
                 className="justify-between"
-                onClick={() => selectOrganization(organization)}
+                onClick={() => handleSelectOrganiation(organization)}
               >
                 {organization.name}
 

@@ -5,3 +5,8 @@
 .cm-editor {
   flex: 1;
 }
+
+.cm-line {
+  font-family: 'Fira code';
+  font-size: 14px;
+}

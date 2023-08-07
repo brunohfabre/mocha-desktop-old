@@ -2,16 +2,17 @@ import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useParams } from 'react-router-dom'
 
+import { useAtom } from 'jotai'
 import { z } from 'zod'
 
+import { Button } from '@/components/Button'
+import { Modal } from '@/components/Modal'
+import { TextInput } from '@/components/TextInput'
+import { api } from '@/lib/api'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQueryClient } from '@tanstack/react-query'
 
-import { Button } from '../../../../components/Button'
-import { Modal } from '../../../../components/Modal'
-import { TextInput } from '../../../../components/TextInput'
-import { api } from '../../../../lib/api'
-import { useCreateFolderModalStore } from './createFolderModalStore'
+import { collectionAtom } from '../../atoms'
+import { createFolderModalVisibleAtom } from './atoms'
 
 const createFolderFormSchema = z.object({
   name: z.string().nonempty(),
@@ -20,24 +21,18 @@ const createFolderFormSchema = z.object({
 type CreateFolderFormData = z.infer<typeof createFolderFormSchema>
 
 export function CreateFolderModal() {
-  const queryClient = useQueryClient()
-
-  const { collectionId } = useParams<{ collectionId: string }>()
-
   const createFolderForm = useForm<CreateFolderFormData>({
     resolver: zodResolver(createFolderFormSchema),
   })
   const { handleSubmit, reset } = createFolderForm
 
-  const visible = useCreateFolderModalStore((state) => state.visible)
-  const changeVisibility = useCreateFolderModalStore(
-    (state) => state.changeVisibility,
-  )
+  const [, setCollection] = useAtom(collectionAtom)
+  const [visible, setVisible] = useAtom(createFolderModalVisibleAtom)
 
   const [loading, setLoading] = useState(false)
 
   function handleCloseModal() {
-    changeVisibility('')
+    setVisible('')
     reset()
   }
 
@@ -54,13 +49,10 @@ export function CreateFolderModal() {
         method: null,
       })
 
-      queryClient.setQueryData(
-        ['collections', collectionId],
-        (prevState: any) => ({
-          ...prevState,
-          requests: [...prevState.requests, response.data.request],
-        }),
-      )
+      setCollection((prevState) => ({
+        ...prevState,
+        requests: [...prevState?.requests, response.data.request],
+      }))
 
       handleCloseModal()
     } finally {

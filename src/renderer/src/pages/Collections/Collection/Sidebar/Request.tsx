@@ -1,34 +1,24 @@
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
 
 import clsx from 'clsx'
-
-import { useQueryClient } from '@tanstack/react-query'
+import { useAtom } from 'jotai'
 
 import { Alert } from '../../../../components/Alert'
 import { Context } from '../../../../components/Context'
 import { api } from '../../../../lib/api'
-
-import { RequestType } from '..'
-
-import { useRequestStore } from '../stores/requestStore'
-import { useResponseStore } from '../stores/responseStore'
+import { RequestType, collectionAtom } from '../atoms'
+import { requestSelectedAtom } from '../Request/atoms'
+import { responseAtom } from '../Response/atoms'
 
 interface RequestProps {
   request: RequestType
 }
 
 export function Request({ request }: RequestProps) {
-  const queryClient = useQueryClient()
+  const [, setCollection] = useAtom(collectionAtom)
 
-  const { collectionId } = useParams<{
-    collectionId: string
-  }>()
-
-  const selectRequest = useRequestStore((state) => state.selectRequest)
-  const requestSelected = useRequestStore((state) => state.request)
-  const setResponseData = useResponseStore((state) => state.setResponseData)
-
+  const [requestSelected, setRequestSelected] = useAtom(requestSelectedAtom)
+  const [, setResponse] = useAtom(responseAtom)
   const [deleteRequestAlertVisible, setDeleteRequestAlertVisible] =
     useState(false)
   const [loading, setLoading] = useState(false)
@@ -39,19 +29,16 @@ export function Request({ request }: RequestProps) {
 
       await api.delete(`/requests/${request.id}`)
 
-      queryClient.setQueryData(
-        ['collections', collectionId],
-        (prevState: any) => ({
-          ...prevState,
-          requests: prevState.requests.filter(
-            (item: any) => item.id !== request.id,
-          ),
-        }),
-      )
+      setCollection((prevState: any) => ({
+        ...prevState,
+        requests: prevState.requests.filter(
+          (item: any) => item.id !== request.id,
+        ),
+      }))
 
       if (request.id === requestSelected?.id) {
-        selectRequest(null)
-        setResponseData(null)
+        setRequestSelected(null)
+        setResponse(null)
       }
     } finally {
       setLoading(true)
@@ -75,8 +62,8 @@ export function Request({ request }: RequestProps) {
           <div
             className="h-8 px-3 flex items-center text-sm hover:bg-zinc-200 cursor-pointer gap-2"
             onClick={() => {
-              selectRequest(request)
-              setResponseData(null)
+              setRequestSelected(request)
+              setResponse(null)
             }}
           >
             <div

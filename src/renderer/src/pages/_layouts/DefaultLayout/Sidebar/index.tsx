@@ -12,7 +12,7 @@ export function Sidebar() {
   const location = useLocation()
 
   return (
-    <div className="flex flex-col w-14 bg-zinc-100">
+    <div className="flex flex-col w-14 bg-zinc-100 border-r border-red-500">
       <button
         type="button"
         className="w-14 h-14 flex items-center justify-center"

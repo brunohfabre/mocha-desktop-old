@@ -1,18 +1,18 @@
 import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
-import { useParams } from 'react-router-dom'
 
+import { useAtom } from 'jotai'
 import { z } from 'zod'
 
+import { Button } from '@/components/Button'
+import { Modal } from '@/components/Modal'
+import { TextInput } from '@/components/TextInput'
+import { api } from '@/lib/api'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQueryClient } from '@tanstack/react-query'
 
-import { Button } from '../../../../components/Button'
-import { Modal } from '../../../../components/Modal'
-import { TextInput } from '../../../../components/TextInput'
-import { api } from '../../../../lib/api'
-import { useRequestStore } from '../stores/requestStore'
-import { useCreateRequestModalStore } from './createRequestModalStore'
+import { collectionAtom } from '../../atoms'
+import { requestSelectedAtom } from '../../Request/atoms'
+import { createRequestModalVisibleAtom } from './atoms'
 
 const createRequestFormSchema = z.object({
   name: z.string().nonempty(),
@@ -21,25 +21,19 @@ const createRequestFormSchema = z.object({
 type CreateRequestFormData = z.infer<typeof createRequestFormSchema>
 
 export function CreateRequestModal() {
-  const queryClient = useQueryClient()
-
-  const { collectionId } = useParams<{ collectionId: string }>()
-
   const createRequestForm = useForm<CreateRequestFormData>({
     resolver: zodResolver(createRequestFormSchema),
   })
   const { handleSubmit, reset } = createRequestForm
 
-  const visible = useCreateRequestModalStore((state) => state.visible)
-  const changeVisibility = useCreateRequestModalStore(
-    (state) => state.changeVisibility,
-  )
-  const selectRequest = useRequestStore((state) => state.selectRequest)
+  const [, setCollection] = useAtom(collectionAtom)
+  const [visible, setVisible] = useAtom(createRequestModalVisibleAtom)
+  const [, setSelectedRequest] = useAtom(requestSelectedAtom)
 
   const [loading, setLoading] = useState(false)
 
   function handleCloseModal() {
-    changeVisibility('')
+    setVisible('')
     reset()
   }
 
@@ -56,16 +50,13 @@ export function CreateRequestModal() {
         method: 'GET',
       })
 
-      queryClient.setQueryData(
-        ['collections', collectionId],
-        (prevState: any) => ({
-          ...prevState,
-          requests: [...prevState.requests, response.data.request],
-        }),
-      )
+      setCollection((prevState: any) => ({
+        ...prevState,
+        requests: [...prevState.requests, response.data.request],
+      }))
 
       handleCloseModal()
-      selectRequest(response.data.request)
+      setSelectedRequest(response.data.request)
     } finally {
       setLoading(false)
     }

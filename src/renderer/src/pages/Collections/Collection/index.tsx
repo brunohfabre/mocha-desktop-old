@@ -1,117 +1,66 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { useQuery } from '@tanstack/react-query'
+import { useAtom } from 'jotai'
 
-import { Spinner } from '../../../components/Spinner'
-import { api } from '../../../lib/api'
-import { CreateFolderModal } from './CreateFolderModal'
-import { CreateRequestModal } from './CreateRequestModal'
+import { api } from '@/lib/api'
+
+import { collectionAtom, CollectionType } from './atoms'
 import { Request } from './Request'
+import { requestSelectedAtom } from './Request/atoms'
 import { Response } from './Response'
 import { Sidebar } from './Sidebar'
-import { useRequestStore } from './stores/requestStore'
-import { useResponseStore } from './stores/responseStore'
-
-export type RequestType = {
-  id: string
-  name: string
-  type: string
-  parentId: string
-  method: string
-}
-
-export type CollectionType = {
-  id: string
-  name: string
-  projectId: string
-  requestId: string
-  requests: RequestType[]
-}
 
 export function Collection() {
   const { collectionId } = useParams<{
     collectionId: string
   }>()
 
-  const responseLoading = useResponseStore((state) => state.loading)
-  const responseData = useResponseStore((state) => state.data)
-  const requestSelected = useRequestStore((state) => state.request)
-  const selectRequest = useRequestStore((state) => state.selectRequest)
-  const setResponseData = useResponseStore((state) => state.setResponseData)
+  const [collection, setCollection] = useAtom(collectionAtom)
+  const [requestSelected, setRequestSelected] = useAtom(requestSelectedAtom)
 
-  const { data: collection, isLoading: isCollectionLoading } = useQuery(
-    ['collections', collectionId],
-    async () => {
-      const response = await api.get(`/collections/${collectionId}`)
-
-      return response.data.collection
-    },
-    {
-      refetchOnWindowFocus: false,
-    },
-  )
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    selectRequest(null)
-    setResponseData(null)
-  }, [selectRequest, setResponseData])
+    async function loadCollection() {
+      try {
+        setLoading(true)
 
-  if (!collection && isCollectionLoading) {
-    return (
-      <div className="flex-1 flex flex-col gap-6 p-4">
-        <div className="bg-zinc-200 h-8 w-56 animate-pulse" />
+        const response = await api.get(`/collections/${collectionId}`)
 
-        <div className="flex-1 flex flex-col gap-2">
-          {new Array(7).fill('').map((_, index) => (
-            <div
-              key={String(index)}
-              className="bg-zinc-200 h-8 w-56 animate-pulse"
-            />
-          ))}
-        </div>
+        setCollection(response.data.collection)
+      } finally {
+        setLoading(false)
+      }
+    }
 
-        <div className="bg-zinc-200 h-8 w-56 animate-pulse" />
-      </div>
-    )
+    loadCollection()
+
+    return () => {
+      setCollection({} as CollectionType)
+      setRequestSelected(null)
+    }
+  }, [collectionId, setCollection, setRequestSelected])
+
+  if (!collection.id && loading) {
+    return <div>loading...</div>
   }
 
   return (
-    <>
-      <CreateRequestModal />
-      <CreateFolderModal />
+    <div className="flex-1 flex overflow-auto">
+      <Sidebar />
 
-      <div className="flex-1 flex overflow-auto">
-        <Sidebar collection={collection!} />
+      {requestSelected ? (
+        <>
+          <Request />
 
-        {requestSelected ? (
-          <>
-            <Request />
-
-            {responseLoading ? (
-              <div className="flex-1 flex items-center justify-center">
-                <Spinner />
-              </div>
-            ) : (
-              <>
-                {responseData ? (
-                  <Response />
-                ) : (
-                  <div className="flex-1 flex items-center justify-center">
-                    <span className="text-sm">
-                      To view response, send a request.
-                    </span>
-                  </div>
-                )}
-              </>
-            )}
-          </>
-        ) : (
-          <div className="flex-1 flex items-center justify-center">
-            <span className="text-sm">To start, select a request.</span>
-          </div>
-        )}
-      </div>
-    </>
+          <Response />
+        </>
+      ) : (
+        <div className="flex-1 flex items-center justify-center">
+          <span className="text-sm">To start, select a request.</span>
+        </div>
+      )}
+    </div>
   )
 }

@@ -1,19 +1,17 @@
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
 
+import { useAtom } from 'jotai'
+
+import { Alert } from '@/components/Alert'
+import { Button } from '@/components/Button'
+import { Context } from '@/components/Context'
+import { api } from '@/lib/api'
 import { CaretRight } from '@phosphor-icons/react'
 import * as Accordion from '@radix-ui/react-accordion'
 
-import { RequestType } from '..'
-
-import { useQueryClient } from '@tanstack/react-query'
-
-import { Alert } from '../../../../components/Alert'
-import { Button } from '../../../../components/Button'
-import { Context } from '../../../../components/Context'
-import { api } from '../../../../lib/api'
-import { useCreateFolderModalStore } from '../CreateFolderModal/createFolderModalStore'
-import { useCreateRequestModalStore } from '../CreateRequestModal/createRequestModalStore'
+import { RequestType, collectionAtom } from '../atoms'
+import { createFolderModalVisibleAtom } from './CreateFolderModal/atoms'
+import { createRequestModalVisibleAtom } from './CreateRequestModal/atoms'
 import { Request } from './Request'
 
 interface FolderProps {
@@ -22,16 +20,11 @@ interface FolderProps {
 }
 
 export function Folder({ request, requests }: FolderProps) {
-  const queryClient = useQueryClient()
-
-  const { collectionId } = useParams<{ collectionId: string }>()
-
-  const changeCreateRequestModalVisibility = useCreateRequestModalStore(
-    (state) => state.changeVisibility,
+  const [, setCollection] = useAtom(collectionAtom)
+  const [, setCreateRequestModalVisible] = useAtom(
+    createRequestModalVisibleAtom,
   )
-  const changeCreateFolderModalVisibility = useCreateFolderModalStore(
-    (state) => state.changeVisibility,
-  )
+  const [, setCreateFolderModalVisible] = useAtom(createFolderModalVisibleAtom)
 
   const [deleteFolderAlertVisible, setDeleteFolderAlertVisible] =
     useState(false)
@@ -41,21 +34,18 @@ export function Folder({ request, requests }: FolderProps) {
 
   async function deleteFolder() {
     try {
-      setLoading(false)
+      setLoading(true)
 
       await api.delete(`/requests/${request.id}`)
 
-      queryClient.setQueryData(
-        ['collections', collectionId],
-        (prevState: any) => ({
-          ...prevState,
-          requests: prevState.requests.filter(
-            (item: any) => item.id !== request.id,
-          ),
-        }),
-      )
+      setCollection((prevState: any) => ({
+        ...prevState,
+        requests: prevState.requests.filter(
+          (item: any) => item.id !== request.id,
+        ),
+      }))
     } finally {
-      setLoading(true)
+      setLoading(false)
     }
   }
 
@@ -88,17 +78,13 @@ export function Folder({ request, requests }: FolderProps) {
                   <div className="flex-1 flex flex-col p-4 gap-2 items-center justify-center">
                     <Button
                       type="button"
-                      onClick={() =>
-                        changeCreateRequestModalVisibility(request.id)
-                      }
+                      onClick={() => setCreateRequestModalVisible(request.id)}
                     >
                       + Request
                     </Button>
                     <Button
                       type="button"
-                      onClick={() =>
-                        changeCreateFolderModalVisibility(request.id)
-                      }
+                      onClick={() => setCreateFolderModalVisible(request.id)}
                     >
                       + Folder
                     </Button>
@@ -122,14 +108,12 @@ export function Folder({ request, requests }: FolderProps) {
         </Context.Trigger>
         <Context.Content>
           <Context.Item
-            onClick={() => changeCreateRequestModalVisibility(request.id)}
+            onClick={() => setCreateRequestModalVisible(request.id)}
           >
             Create request
           </Context.Item>
 
-          <Context.Item
-            onClick={() => changeCreateFolderModalVisibility(request.id)}
-          >
+          <Context.Item onClick={() => setCreateFolderModalVisible(request.id)}>
             Create folder
           </Context.Item>
 

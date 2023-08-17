@@ -25,7 +25,7 @@ export function Query() {
               append({
                 name: '',
                 value: '',
-                active: false,
+                active: true,
               })
             }
           >
@@ -37,7 +37,7 @@ export function Query() {
           {fields.map((field, index) => (
             <div key={field.id} className="flex gap-2 items-end">
               <Controller
-                name={`headers.${index}.active`}
+                name={`query.${index}.active`}
                 render={({ field }) => (
                   <button
                     type="button"

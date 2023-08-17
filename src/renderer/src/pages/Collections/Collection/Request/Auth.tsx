@@ -1,104 +1,80 @@
-import { useCallback, useRef, useState } from 'react'
-
-import { useAtom } from 'jotai'
-import _ from 'lodash'
+import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/Button'
 import { Dropdown } from '@/components/Dropdown'
 import { Tabs } from '@/components/Tabs'
-import { api } from '@/lib/api'
 import { CaretDown } from '@phosphor-icons/react'
 
-import { collectionAtom, collectionLoadingAtom } from '../atoms'
-import { requestSelectedAtom } from './atoms'
+import { RequestType } from '../atoms'
 
-export function Auth() {
-  const usernameInputRef = useRef<HTMLInputElement>(null)
-  const passwordInputRef = useRef<HTMLInputElement>(null)
-  const tokenInputRef = useRef<HTMLInputElement>(null)
+interface AuthProps {
+  request: RequestType
+  onChangeData: (data: Record<string, any>) => void
+}
 
-  const [requestSelected] = useAtom(requestSelectedAtom)
-  const [, setCollection] = useAtom(collectionAtom)
-  const [, setCollectionLoading] = useAtom(collectionLoadingAtom)
+export function Auth({ request, onChangeData }: AuthProps) {
+  const [authType, setAuthType] = useState('')
+  const [auth, setAuth] = useState<Record<string, string>>({})
 
-  const [authType, setAuthType] = useState(requestSelected?.authType)
-
-  async function updateRequest(data: { [key: string]: any }) {
-    try {
-      setCollectionLoading(true)
-
-      await api.put(`/requests/${requestSelected?.id}`, data)
-    } finally {
-      setCollectionLoading(false)
-    }
-  }
-
-  const debounceAuthType = useCallback(_.debounce(updateRequest, 750), [
-    requestSelected,
-  ])
-  const debounceAuth = useCallback(_.debounce(updateRequest, 750), [
-    requestSelected,
-  ])
-
-  function updateLocal(data: { [key: string]: any }) {
-    setCollection((prevState) => ({
-      ...prevState,
-      requests: prevState.requests.map((item) =>
-        item.id === requestSelected?.id ? { ...item, ...data } : item,
-      ),
-    }))
-  }
+  useEffect(() => {
+    setAuthType(request.authType ?? 'NONE')
+    setAuth(request.auth ?? {})
+  }, [request])
 
   return (
     <Tabs.Content value="auth">
       <div className="flex-1 flex flex-col relative">
         {authType === 'BASIC' && (
           <div className="flex flex-col gap-2 p-4">
-            <div className="flex flex-col">
+            <div className="flex flex-col gap-1">
               <label htmlFor="username" className="text-sm">
                 Username
               </label>
+
               <input
-                ref={usernameInputRef}
                 type="text"
                 id="username"
-                className="bg-red-200 h-10 px-4 text-sm"
                 placeholder="Username"
-                defaultValue={requestSelected?.auth?.username}
+                className="bg-red-200 h-10 px-4 text-sm"
+                value={auth.username}
                 onChange={(event) => {
-                  const value = {
+                  onChangeData({
                     auth: {
-                      token: '',
+                      ...auth,
                       username: event.target.value,
                     },
-                  }
+                  })
 
-                  updateLocal(value)
-                  debounceAuth(value)
+                  setAuth({
+                    ...auth,
+                    username: event.target.value,
+                  })
                 }}
               />
             </div>
-            <div className="flex flex-col">
+            <div className="flex flex-col gap-1">
               <label htmlFor="password" className="text-sm">
                 Password
               </label>
+
               <input
-                ref={passwordInputRef}
                 type="text"
                 id="password"
-                className="bg-red-200 h-10 px-4 text-sm"
                 placeholder="Password"
-                defaultValue={requestSelected?.auth?.password}
+                className="bg-red-200 h-10 px-4 text-sm"
+                value={auth.password}
                 onChange={(event) => {
-                  const value = {
+                  onChangeData({
                     auth: {
-                      token: '',
+                      ...auth,
                       password: event.target.value,
                     },
-                  }
+                  })
 
-                  updateLocal(value)
-                  debounceAuth(value)
+                  setAuth({
+                    ...auth,
+                    password: event.target.value,
+                  })
                 }}
               />
             </div>
@@ -107,30 +83,27 @@ export function Auth() {
 
         {authType === 'BEARER' && (
           <div className="p-4">
-            <div className="flex flex-col">
+            <div className="flex flex-col gap-1">
               <label htmlFor="token" className="text-sm">
                 Token
               </label>
+
               <input
-                ref={tokenInputRef}
                 type="text"
                 id="token"
-                className="bg-red-200 h-10 px-4 text-sm"
                 placeholder="Token"
-                defaultValue={requestSelected?.auth?.token}
+                className="bg-red-200 h-10 px-4 text-sm"
+                value={auth.token}
                 onChange={(event) => {
-                  console.log(event.target.value)
-
-                  const value = {
+                  onChangeData({
                     auth: {
-                      username: '',
-                      password: '',
                       token: event.target.value,
                     },
-                  }
+                  })
 
-                  updateLocal(value)
-                  debounceAuth(value)
+                  setAuth({
+                    token: event.target.value,
+                  })
                 }}
               />
             </div>
@@ -148,14 +121,12 @@ export function Auth() {
             <Dropdown.Content align="end">
               <Dropdown.Item
                 onClick={() => {
-                  setAuthType('NONE')
-
-                  const value = {
+                  onChangeData({
                     authType: 'NONE',
                     auth: {},
-                  }
-                  updateLocal(value)
-                  debounceAuthType(value)
+                  })
+
+                  setAuthType('NONE')
                 }}
               >
                 NONE
@@ -163,13 +134,12 @@ export function Auth() {
 
               <Dropdown.Item
                 onClick={() => {
-                  setAuthType('BASIC')
-                  const value = {
+                  onChangeData({
                     authType: 'BASIC',
                     auth: {},
-                  }
-                  updateLocal(value)
-                  debounceAuthType(value)
+                  })
+
+                  setAuthType('BASIC')
                 }}
               >
                 BASIC
@@ -177,13 +147,12 @@ export function Auth() {
 
               <Dropdown.Item
                 onClick={() => {
-                  setAuthType('BEARER')
-                  const value = {
+                  onChangeData({
                     authType: 'BEARER',
                     auth: {},
-                  }
-                  updateLocal(value)
-                  debounceAuthType(value)
+                  })
+
+                  setAuthType('BEARER')
                 }}
               >
                 BEARER

@@ -1,9 +1,11 @@
-import { useFormContext } from 'react-hook-form'
-import { Label } from './Form/Label'
-import { FormControl } from './Form/FormControl'
-import { Error } from './Form/Error'
 import { InputHTMLAttributes, useState } from 'react'
+import { useFormContext } from 'react-hook-form'
+
 import { Eye, EyeSlash } from '@phosphor-icons/react'
+
+import { Error } from './FormComponents/Error'
+import { FormControl } from './FormComponents/FormControl'
+import { Label } from './FormComponents/Label'
 
 interface PasswordInputProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string

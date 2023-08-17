@@ -3,22 +3,12 @@ import { useAtom } from 'jotai'
 import { Loader2 } from 'lucide-react'
 
 import { Tabs } from '@/components/Tabs'
-import Editor from '@monaco-editor/react'
 
 import { responseAtom, responseLoadingAtom } from './atoms'
 
 export function Response() {
   const [responseLoading] = useAtom(responseLoadingAtom)
   const [response] = useAtom(responseAtom)
-
-  function handleEditorDidMount(editor: any) {
-    window.addEventListener('resize', () => {
-      editor.layout({
-        width: 'auto',
-        height: 'auto',
-      })
-    })
-  }
 
   return (
     <div className="flex-1 flex flex-col overflow-auto relative">
@@ -48,7 +38,7 @@ export function Response() {
                   'bg-red-400',
               )}
             >
-              {response.status}
+              {response.code} {response.status}
             </span>
             <span className="text-sm">{response.time}</span>
             <span className="text-sm">{response.size}</span>
@@ -62,48 +52,17 @@ export function Response() {
             </Tabs.List>
 
             <Tabs.Content value="preview">
-              <div className="flex-1 flex">
-                {response.response.response?.data && (
-                  <Editor
-                    defaultLanguage="json"
-                    defaultValue=""
-                    onMount={handleEditorDidMount}
-                    value={JSON.stringify(
-                      response.response?.response.data,
-                      null,
-                      2,
-                    )}
-                    options={{
-                      readOnly: true,
-
-                      detectIndentation: false,
-                      tabSize: 2,
-                      scrollBeyondLastLine: false,
-                      minimap: {
-                        enabled: false,
-                      },
-                    }}
-                  />
-                )}
-              </div>
+              <code className="flex-1 flex overflow-auto">
+                <pre>{JSON.stringify(response.response?.data, null, 2)}</pre>
+              </code>
             </Tabs.Content>
 
             <Tabs.Content value="headers">
-              <p>
-                HEADERS - Lorem ipsum dolor sit amet consectetur adipisicing
-                elit. Nesciunt sequi quas, inventore earum et accusamus
-                quibusdam iste odit quae porro, consectetur minima saepe nihil
-                accusantium necessitatibus voluptate maiores quidem rem!
-              </p>
+              <p>HEADERS</p>
             </Tabs.Content>
 
             <Tabs.Content value="cookies">
-              <p>
-                COOKIES - Lorem ipsum dolor sit amet consectetur adipisicing
-                elit. Nesciunt sequi quas, inventore earum et accusamus
-                quibusdam iste odit quae porro, consectetur minima saepe nihil
-                accusantium necessitatibus voluptate maiores quidem rem!
-              </p>
+              <p>COOKIES</p>
             </Tabs.Content>
           </Tabs.Root>
         </>

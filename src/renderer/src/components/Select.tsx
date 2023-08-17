@@ -1,9 +1,9 @@
 import { SelectHTMLAttributes } from 'react'
 import { useFormContext } from 'react-hook-form'
 
-import { Error } from './Form/Error'
-import { FormControl } from './Form/FormControl'
-import { Label } from './Form/Label'
+import { Error } from './FormComponents/Error'
+import { FormControl } from './FormComponents/FormControl'
+import { Label } from './FormComponents/Label'
 
 type OptionType = {
   value: any

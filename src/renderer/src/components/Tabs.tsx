@@ -1,7 +1,9 @@
 import * as RadixTabs from '@radix-ui/react-tabs'
 
 function Root(props: RadixTabs.TabsProps) {
-  return <RadixTabs.Root className="flex-1 flex flex-col" {...props} />
+  return (
+    <RadixTabs.Root className="flex-1 flex flex-col overflow-auto" {...props} />
+  )
 }
 
 function List(props: RadixTabs.TabsListProps) {

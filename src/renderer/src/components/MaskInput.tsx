@@ -3,9 +3,9 @@ import { Controller, useFormContext } from 'react-hook-form'
 
 import { toPattern } from 'vanilla-masker'
 
-import { Error } from './Form/Error'
-import { FormControl } from './Form/FormControl'
-import { Label } from './Form/Label'
+import { Error } from './FormComponents/Error'
+import { FormControl } from './FormComponents/FormControl'
+import { Label } from './FormComponents/Label'
 
 function maskValue(value: string = '', mask: string) {
   const originalValue = value.replace(/[^\w\s]/gi, '')

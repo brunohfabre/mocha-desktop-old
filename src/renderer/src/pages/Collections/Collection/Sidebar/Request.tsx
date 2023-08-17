@@ -1,27 +1,36 @@
 import { useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import clsx from 'clsx'
 import { useAtom } from 'jotai'
 
-import { Alert } from '../../../../components/Alert'
-import { Context } from '../../../../components/Context'
-import { api } from '../../../../lib/api'
+import { Alert } from '@/components/Alert'
+import { Context } from '@/components/Context'
+import { api } from '@/lib/api'
+
 import { RequestType, collectionAtom } from '../atoms'
-import { requestSelectedAtom } from '../Request/atoms'
-import { responseAtom } from '../Response/atoms'
 
 interface RequestProps {
   request: RequestType
 }
 
 export function Request({ request }: RequestProps) {
+  const { collectionId, requestId } = useParams<{
+    collectionId: string
+    requestId: string
+  }>()
+
+  const navigate = useNavigate()
+
   const [, setCollection] = useAtom(collectionAtom)
 
-  const [requestSelected, setRequestSelected] = useAtom(requestSelectedAtom)
-  const [, setResponse] = useAtom(responseAtom)
   const [deleteRequestAlertVisible, setDeleteRequestAlertVisible] =
     useState(false)
   const [loading, setLoading] = useState(false)
+
+  function handleSelectRequest() {
+    navigate(`/collections/${collectionId}/${request.id}`)
+  }
 
   async function deleteRequest() {
     try {
@@ -36,9 +45,8 @@ export function Request({ request }: RequestProps) {
         ),
       }))
 
-      if (request.id === requestSelected?.id) {
-        setRequestSelected(null)
-        setResponse(null)
+      if (requestId === request.id) {
+        navigate(`/collections/${collectionId}`)
       }
     } finally {
       setLoading(true)
@@ -61,10 +69,7 @@ export function Request({ request }: RequestProps) {
         <Context.Trigger>
           <div
             className="h-8 px-3 flex items-center text-sm hover:bg-zinc-200 cursor-pointer gap-2"
-            onClick={() => {
-              setRequestSelected(request)
-              setResponse(null)
-            }}
+            onClick={handleSelectRequest}
           >
             <div
               className={clsx(

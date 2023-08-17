@@ -1,73 +1,77 @@
-import { useFormContext, useController } from 'react-hook-form'
+import { useEffect, useState } from 'react'
 
+import { Button } from '@/components/Button'
+import { Dropdown } from '@/components/Dropdown'
+import { Tabs } from '@/components/Tabs'
 import { json } from '@codemirror/lang-json'
-import { Editor } from '@monaco-editor/react'
 import { CaretDown } from '@phosphor-icons/react'
 import CodeMirror from '@uiw/react-codemirror'
 
-import { Button } from '../../../../components/Button'
-import { Dropdown } from '../../../../components/Dropdown'
-import { Tabs } from '../../../../components/Tabs'
+import { RequestType } from '../atoms'
 
-export function Body() {
-  const { control } = useFormContext()
-  const { field: editorField } = useController({
-    name: 'body',
-    control,
-  })
-  const { field: typeField } = useController({
-    name: 'bodyType',
-    control,
-  })
+interface BodyProps {
+  request: RequestType
+  onChangeData: (data: Record<string, any>) => void
+}
 
-  function handleEditorDidMount(editor: any) {
-    window.addEventListener('resize', () => {
-      editor.layout({
-        width: 'auto',
-        height: 'auto',
-      })
-    })
-  }
+export function Body({ request, onChangeData }: BodyProps) {
+  const [bodyType, setBodyType] = useState('')
+  const [body, setBody] = useState('')
+
+  useEffect(() => {
+    setBodyType(request.bodyType ?? 'NONE')
+    setBody(request.body ?? '')
+  }, [request])
 
   return (
     <Tabs.Content value="body">
       <div className="flex-1 flex flex-col relative">
-        {typeField.value === 'JSON' && (
+        {bodyType === 'JSON' && (
           <CodeMirror
-            value="console.log('hello world!');"
+            value={body}
             extensions={[json()]}
-            onChange={console.log}
+            onChange={(value) => {
+              onChangeData({
+                body: value,
+              })
+
+              setBody(value)
+            }}
             className="flex-1 flex overflow-auto"
           />
-          // <Editor
-          //   defaultLanguage="json"
-          //   options={{
-          //     detectIndentation: false,
-          //     tabSize: 2,
-          //     scrollBeyondLastLine: false,
-          //     minimap: {
-          //       enabled: false,
-          //     },
-          //   }}
-          //   onMount={handleEditorDidMount}
-          //   value={editorField.value}
-          //   onChange={editorField.onChange}
-          // />
         )}
 
         <div className="absolute bottom-4 right-[30px]">
           <Dropdown.Root>
             <Dropdown.Trigger>
               <Button type="button">
-                {typeField.value} <CaretDown className="ml-2" />
+                {bodyType} <CaretDown className="ml-2" />
               </Button>
             </Dropdown.Trigger>
 
             <Dropdown.Content align="end">
-              <Dropdown.Item onClick={() => typeField.onChange('NONE')}>
+              <Dropdown.Item
+                onClick={() => {
+                  onChangeData({
+                    bodyType: 'NONE',
+                    body: '',
+                  })
+
+                  setBodyType('NONE')
+                }}
+              >
                 NONE
               </Dropdown.Item>
-              <Dropdown.Item onClick={() => typeField.onChange('JSON')}>
+              <Dropdown.Item
+                onClick={() => {
+                  onChangeData({
+                    bodyType: 'JSON',
+                    body: '',
+                  })
+
+                  setBodyType('JSON')
+                }}
+              >
                 JSON
               </Dropdown.Item>
             </Dropdown.Content>

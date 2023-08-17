@@ -1,159 +1,105 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
 
 import axios, { AxiosError } from 'axios'
 import { useAtom } from 'jotai'
 import _ from 'lodash'
 
+import { Button } from '@/components/Button'
+import { Tabs } from '@/components/Tabs'
+import { api } from '@/lib/api'
 import { formatBytes } from '@/utils/formatBytes'
 import { formatTime } from '@/utils/formatTime'
 import { httpStatusCodes } from '@/utils/httpStatusCodes'
 
-import { Button } from '../../../../components/Button'
-import { Tabs } from '../../../../components/Tabs'
-import { api } from '../../../../lib/api'
-import { collectionAtom, collectionLoadingAtom } from '../atoms'
+import { collectionAtom, collectionLoadingAtom, RequestType } from '../atoms'
 import { responseAtom, responseLoadingAtom } from '../Response/atoms'
-import { requestSelectedAtom } from './atoms'
 import { Auth } from './Auth'
 import { Body } from './Body'
 import { Headers } from './Headers'
 import { Query } from './Query'
 
-export function Request() {
-  const methodRef = useRef<HTMLSelectElement>(null)
-  const routeRef = useRef<HTMLInputElement>(null)
+interface RequestProps {
+  request: RequestType
+}
+
+export function Request({ request }: RequestProps) {
+  const { requestId } = useParams<{ requestId: string }>()
 
   const [collection, setCollection] = useAtom(collectionAtom)
-  const [requestSelected] = useAtom(requestSelectedAtom)
   const [, setCollectionLoading] = useAtom(collectionLoadingAtom)
   const [, setResponseLoading] = useAtom(responseLoadingAtom)
   const [, setResponse] = useAtom(responseAtom)
 
-  useEffect(() => {
-    if (methodRef.current && routeRef.current) {
-      methodRef.current.value = requestSelected?.method ?? 'GET'
-      routeRef.current.value = requestSelected?.route ?? ''
-    }
-  }, [requestSelected])
+  const [method, setMethod] = useState('')
+  const [route, setRoute] = useState('')
 
-  async function updateRequest(data: { [key: string]: any }) {
+  useEffect(() => {
+    setMethod(request.method ?? '')
+    setRoute(request.route ?? '')
+  }, [request])
+
+  async function updateRequest(data: Record<string, any>) {
     try {
       setCollectionLoading(true)
 
-      await api.put(`/requests/${requestSelected?.id}`, data)
+      await api.put(`/requests/${requestId}`, data)
     } finally {
       setCollectionLoading(false)
     }
   }
 
-  const debounceMethod = useCallback(_.debounce(updateRequest, 750), [
-    requestSelected,
-  ])
-  const debounceRoute = useCallback(_.debounce(updateRequest, 750), [
-    requestSelected,
-  ])
+  const debouceRequest = useCallback(_.debounce(updateRequest, 750), [])
 
-  function updateLocal(data: { [key: string]: any }) {
+  function handleChangeData(data: Record<string, any>) {
     setCollection((prevState) => ({
       ...prevState,
       requests: prevState.requests.map((item) =>
-        item.id === requestSelected?.id ? { ...item, ...data } : item,
+        item.id === requestId ? { ...item, ...data } : item,
       ),
     }))
+
+    debouceRequest(data)
   }
 
-  // useEffect(() => {
-  //   if (requestSelected) {
-  //     reset(requestSelected)
-  //   }
-  // }, [reset, requestSelected])
-
-  // useEffect(() => {
-  //   const subscription = watch((data: any) => {
-  //     debounceRequest(data)
-
-  //     queryClient.setQueryData(
-  //       ['collections', collectionId],
-  //       (prevState: any) => ({
-  //         ...prevState,
-  //         requests: prevState.requests.map((request: RequestType) =>
-  //           request.id === data.id ? data : request,
-  //         ),
-  //       }),
-  //     )
-  //   })
-
-  //   return () => {
-  //     subscription.unsubscribe()
-  //   }
-  // }, [watch, debounceRequest, collectionId, queryClient])
-
-  // async function sendRequest(data: RequestFormData) {
-  //   try {
-  //     setResponseLoading(true)
-  //     const startMillis = Date.now()
-
-  //     const { method, route, body, headers, query } = data
-
-  //     await axios({
-  //       method,
-  //       url: route,
-  //       data: body,
-  //       headers: headers?.reduce(
-  //         (acc, item) => ({ ...acc, [item.name]: item.value }),
-  //         {},
-  //       ),
-  //       params: query?.reduce(
-  //         (acc, item) => ({ ...acc, [item.name]: item.value }),
-  //         {},
-  //       ),
-  //       withCredentials: true,
-  //     })
-  //       .then((response) => {
-  //         const responseTime = Date.now() - startMillis
-
-  //         setResponseData({
-  //           response,
-  //           time: responseTime,
-  //         })
-  //       })
-  //       .catch((err) => {
-  //         const responseTime = Date.now() - startMillis
-
-  //         setResponseData({
-  //           response: err.response,
-  //           time: responseTime,
-  //         })
-  //       })
-  //   } finally {
-  //     setResponseLoading(false)
-  //   }
-  // }
-
-  async function handleSend() {
-    const requestToSend = collection.requests.find(
-      (item) => item.id === requestSelected?.id,
-    )
-
-    if (!requestToSend) {
-      return
-    }
+  function handleSendRequest() {
+    setResponseLoading(true)
 
     const startMillis = Date.now()
 
-    setResponseLoading(true)
+    const requestHeaders: Record<string, any> = {}
 
-    console.log(requestToSend)
+    // if (authType === 'BEARER') {
+    //   requestHeaders = {
+    //     Authorization: `Bearer ${auth.token}`,
+    //   }
+    // }
+    // headers
+    //   .filter((item) => item.active)
+    //   .filter((item) => !!item.name)
+    //   .forEach((item) => {
+    //     requestHeaders[item.name] = item.value
+    //   })
+
+    if (request.bodyType === 'JSON') {
+      requestHeaders['content-type'] = 'application/json'
+    }
+
+    const requestQuery: Record<string, any> = {}
+
+    // query
+    //   .filter((item) => item.active)
+    //   .filter((item) => !!item.name)
+    //   .forEach((item) => {
+    //     requestQuery[item.name] = item.value
+    //   })
 
     axios({
-      method: requestToSend.method,
-      url: requestToSend.route,
-      headers: {
-        Authorization:
-          requestToSend.authType === 'BEARER'
-            ? `Bearer ${requestToSend.auth?.token}`
-            : '',
-      },
+      method,
+      url: route,
+      headers: requestHeaders,
+      params: requestQuery,
+      data: request.body,
     })
       .then((response) => {
         const time = formatTime(Date.now() - startMillis)
@@ -169,40 +115,49 @@ export function Request() {
           size,
           code: String(response.status),
         })
-        setResponseLoading(false)
       })
       .catch((error) => {
         if (error instanceof AxiosError) {
           const time = formatTime(Date.now() - startMillis)
-          const status = error.response
-            ? `${error.response.status} ${
-                httpStatusCodes[error.response.status]
-              }`
-            : 'Error'
-          const size = '0 B'
+          const status = httpStatusCodes[error.response?.status ?? 'error']
+          const size = formatBytes(
+            encodeURI(JSON.stringify(error.response?.data)).split(/%..|./)
+              .length - 1,
+          )
 
           setResponse({
-            response: error,
+            response: error.response as any,
             time,
             status,
             size,
-            code: String(error.response?.status ?? 0),
+            code: String(error.response?.status),
           })
-          setResponseLoading(false)
         }
+      })
+      .finally(() => {
+        setResponseLoading(false)
       })
   }
 
   return (
     <div className="flex-1 flex flex-col border-r border-red-500 overflow-auto">
-      <header className="flex">
+      <form
+        onSubmit={(event) => {
+          event.preventDefault()
+
+          handleSendRequest()
+        }}
+        className="flex"
+      >
         <select
-          ref={methodRef}
-          className="bg-red-200 h-10 px-4 text-sm"
+          value={method}
           onChange={(event) => {
-            updateLocal({ method: event.target.value })
-            debounceMethod({ method: event.target.value })
+            handleChangeData({
+              method: event.target.value,
+            })
+            setMethod(event.target.value)
           }}
+          className="flex px-4 h-10 bg-red-200"
         >
           <option value="GET">GET</option>
           <option value="POST">POST</option>
@@ -212,20 +167,18 @@ export function Request() {
         </select>
 
         <input
-          ref={routeRef}
           type="text"
-          className="bg-red-200 h-10 px-4 text-sm flex-1"
-          placeholder="https://my-api.com/v1/users"
+          placeholder="Route here"
+          value={route}
           onChange={(event) => {
-            updateLocal({ route: event.target.value })
-            debounceRoute({ route: event.target.value })
+            handleChangeData({ route: event.target.value })
+            setRoute(event.target.value)
           }}
+          className="flex-1 flex px-4 h-10 bg-red-200"
         />
 
-        <Button type="button" onClick={handleSend}>
-          SEND
-        </Button>
-      </header>
+        <Button type="submit">SEND</Button>
+      </form>
 
       <Tabs.Root defaultValue="body">
         <Tabs.List>
@@ -235,10 +188,10 @@ export function Request() {
           <Tabs.Item value="query">Query</Tabs.Item>
         </Tabs.List>
 
-        {/* <Body /> */}
-        <Auth />
-        {/* <Headers />
-        <Query /> */}
+        <Body request={request} onChangeData={handleChangeData} />
+        <Auth request={request} onChangeData={handleChangeData} />
+        {/* <Headers request={request} onChangeData={handleChangeData} /> */}
+        {/*  <Query /> */}
       </Tabs.Root>
     </div>
   )

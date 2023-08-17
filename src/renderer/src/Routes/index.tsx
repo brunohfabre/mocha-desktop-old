@@ -1,6 +1,7 @@
 import { Router, Route } from 'electron-router-dom'
 
 import { CodeVerification } from '@/pages/CodeVerification'
+import { RequestContent } from '@/pages/Collections/Collection/RequestContent'
 import { Oauth } from '@/pages/Oauth'
 
 import { AuthLayout } from '../pages/_layouts/AuthLayout'
@@ -37,10 +38,19 @@ export function Routes() {
 
               <Route path="/collections" element={<Collections />} />
 
-              <Route
-                path="/collections/:collectionId"
-                element={<Collection />}
-              />
+              <Route path="/collections/:collectionId" element={<Collection />}>
+                <Route path=":requestId" element={<RequestContent />} />
+                <Route
+                  path=""
+                  element={
+                    <div className="flex-1 flex items-center justify-center">
+                      <span className="text-sm">
+                        To start, select a request.
+                      </span>
+                    </div>
+                  }
+                />
+              </Route>
             </Route>
 
             <Route element={<InternalLayout />}>

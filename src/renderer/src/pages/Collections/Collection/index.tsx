@@ -1,14 +1,11 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Outlet, useParams } from 'react-router-dom'
 
 import { useAtom } from 'jotai'
 
 import { api } from '@/lib/api'
 
 import { collectionAtom, CollectionType } from './atoms'
-import { Request } from './Request'
-import { requestSelectedAtom } from './Request/atoms'
-import { Response } from './Response'
 import { Sidebar } from './Sidebar'
 
 export function Collection() {
@@ -17,7 +14,6 @@ export function Collection() {
   }>()
 
   const [collection, setCollection] = useAtom(collectionAtom)
-  const [requestSelected, setRequestSelected] = useAtom(requestSelectedAtom)
 
   const [loading, setLoading] = useState(false)
 
@@ -38,9 +34,8 @@ export function Collection() {
 
     return () => {
       setCollection({} as CollectionType)
-      setRequestSelected(null)
     }
-  }, [collectionId, setCollection, setRequestSelected])
+  }, [collectionId, setCollection])
 
   if (!collection.id && loading) {
     return <div>loading...</div>
@@ -50,17 +45,7 @@ export function Collection() {
     <div className="flex-1 flex overflow-auto">
       <Sidebar />
 
-      {requestSelected ? (
-        <>
-          <Request />
-
-          <Response />
-        </>
-      ) : (
-        <div className="flex-1 flex items-center justify-center">
-          <span className="text-sm">To start, select a request.</span>
-        </div>
-      )}
+      <Outlet />
     </div>
   )
 }

@@ -11,7 +11,6 @@ import { api } from '@/lib/api'
 import { zodResolver } from '@hookform/resolvers/zod'
 
 import { collectionAtom } from '../../atoms'
-import { requestSelectedAtom } from '../../Request/atoms'
 import { createRequestModalVisibleAtom } from './atoms'
 
 const createRequestFormSchema = z.object({
@@ -28,7 +27,6 @@ export function CreateRequestModal() {
 
   const [, setCollection] = useAtom(collectionAtom)
   const [visible, setVisible] = useAtom(createRequestModalVisibleAtom)
-  const [, setSelectedRequest] = useAtom(requestSelectedAtom)
 
   const [loading, setLoading] = useState(false)
 
@@ -56,7 +54,6 @@ export function CreateRequestModal() {
       }))
 
       handleCloseModal()
-      setSelectedRequest(response.data.request)
     } finally {
       setLoading(false)
     }

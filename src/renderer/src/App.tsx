@@ -17,7 +17,7 @@ const queryClient = new QueryClient({
 export function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen min-w-screen flex flex-col">
+      <div className="h-screen min-w-screen flex flex-col">
         {window.api.platform === 'darwin' && (
           <div className="h-8 region-drag flex items-center justify-center">
             <span className="text-xs font-medium text-zinc-800">Mocha</span>

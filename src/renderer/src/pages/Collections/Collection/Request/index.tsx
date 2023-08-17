@@ -26,7 +26,7 @@ interface RequestProps {
 export function Request({ request }: RequestProps) {
   const { requestId } = useParams<{ requestId: string }>()
 
-  const [collection, setCollection] = useAtom(collectionAtom)
+  const [, setCollection] = useAtom(collectionAtom)
   const [, setCollectionLoading] = useAtom(collectionLoadingAtom)
   const [, setResponseLoading] = useAtom(responseLoadingAtom)
   const [, setResponse] = useAtom(responseAtom)
@@ -190,8 +190,8 @@ export function Request({ request }: RequestProps) {
 
         <Body request={request} onChangeData={handleChangeData} />
         <Auth request={request} onChangeData={handleChangeData} />
-        {/* <Headers request={request} onChangeData={handleChangeData} /> */}
-        {/*  <Query /> */}
+        <Headers request={request} onChangeData={handleChangeData} />
+        <Query request={request} onChangeData={handleChangeData} />
       </Tabs.Root>
     </div>
   )

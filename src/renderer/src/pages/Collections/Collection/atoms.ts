@@ -14,8 +14,8 @@ export type RequestType = {
   auth: { [key: string]: any } | null
   authType: string
 
-  headers: string | null
-  query: string | null
+  headers: { active: boolean; name: string; value: string }[]
+  query: { active: boolean; name: string; value: string }[]
 
   createdAt: string
 }

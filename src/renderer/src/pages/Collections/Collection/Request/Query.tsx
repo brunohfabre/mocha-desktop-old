@@ -1,19 +1,33 @@
-import { useFormContext, useFieldArray, Controller } from 'react-hook-form'
+import { useEffect, useState } from 'react'
 
+import { Button } from '@/components/Button'
+import { IconButton } from '@/components/IconButton'
+import { Tabs } from '@/components/Tabs'
 import { Check, Trash } from '@phosphor-icons/react'
 
-import { Button } from '../../../../components/Button'
-import { IconButton } from '../../../../components/IconButton'
-import { Tabs } from '../../../../components/Tabs'
-import { TextInput } from '../../../../components/TextInput'
+import { RequestType } from '../atoms'
 
-export function Query() {
-  const { control } = useFormContext()
+type QueryType = {
+  id: string
+  active: boolean
+  name: string
+  value: string
+}
 
-  const { fields, append, remove } = useFieldArray({
-    name: 'query',
-    control,
-  })
+interface QueryProps {
+  request: RequestType
+  onChangeData: (data: Record<string, any>) => void
+}
+
+export function Query({ request, onChangeData }: QueryProps) {
+  const [query, setQuery] = useState<QueryType[]>([])
+
+  useEffect(() => {
+    console.log(request)
+    setQuery(
+      request.query?.map((item) => ({ ...item, id: crypto.randomUUID() })),
+    )
+  }, [request])
 
   return (
     <Tabs.Content value="query">
@@ -21,49 +35,100 @@ export function Query() {
         <div className="flex justify-end">
           <Button
             type="button"
-            onClick={() =>
-              append({
-                name: '',
-                value: '',
-                active: true,
+            onClick={() => {
+              const value = [
+                ...query,
+                {
+                  id: crypto.randomUUID(),
+                  active: true,
+                  name: '',
+                  value: '',
+                },
+              ]
+
+              setQuery(value)
+
+              onChangeData({
+                query: value,
               })
-            }
+            }}
           >
             + Query
           </Button>
         </div>
 
         <div className="flex flex-col gap-2">
-          {fields.map((field, index) => (
-            <div key={field.id} className="flex gap-2 items-end">
-              <Controller
-                name={`query.${index}.active`}
-                render={({ field }) => (
-                  <button
-                    type="button"
-                    className="h-10 w-10 bg-blue-200 flex items-center justify-center"
-                    onClick={() => field.onChange(!field.value)}
-                  >
-                    {field.value && <Check size={18} weight="bold" />}
-                  </button>
-                )}
-              />
-              <div className="flex-1">
-                <TextInput
-                  name={`query.${index}.name`}
-                  label="Name"
-                  placeholder="Name"
-                />
-              </div>
-              <div className="flex-1">
-                <TextInput
-                  name={`query.${index}.value`}
-                  label="Value"
-                  placeholder="Value"
-                />
-              </div>
+          {query.map((item, index) => (
+            <div key={item.id} className="flex gap-2 items-end">
+              <button
+                type="button"
+                className="w-10 h-10 bg-blue-200 flex items-center justify-center"
+                onClick={() => {
+                  const newQueries = query.map((queryItem) =>
+                    queryItem.id === item.id
+                      ? { ...queryItem, active: !queryItem.active }
+                      : queryItem,
+                  )
 
-              <IconButton type="button" onClick={() => remove(index)}>
+                  setQuery(newQueries)
+                  onChangeData({
+                    query: newQueries,
+                  })
+                }}
+              >
+                {item.active && <Check size={16} />}
+              </button>
+
+              <input
+                type="text"
+                placeholder="Name"
+                className="flex-1 min-w-[64px] h-10 bg-red-200 px-4"
+                value={item.name}
+                onChange={(event) => {
+                  const value = event.target.value
+
+                  const newQueries = query.map((queryItem) =>
+                    queryItem.id === item.id
+                      ? { ...queryItem, name: value }
+                      : queryItem,
+                  )
+
+                  setQuery(newQueries)
+                  onChangeData({
+                    query: newQueries,
+                  })
+                }}
+              />
+
+              <input
+                type="text"
+                placeholder="Value"
+                className="flex-1 min-w-[64px] h-10 bg-red-200 px-4"
+                value={item.value}
+                onChange={(event) => {
+                  const value = event.target.value
+
+                  const newQueries = query.map((queryItem) =>
+                    queryItem.id === item.id
+                      ? { ...queryItem, value }
+                      : queryItem,
+                  )
+
+                  setQuery(newQueries)
+                  onChangeData({
+                    query: newQueries,
+                  })
+                }}
+              />
+
+              <IconButton
+                type="button"
+                onClick={() =>
+                  setQuery((prevState) =>
+                    prevState.filter((queryItem) => queryItem.id !== item.id),
+                  )
+                }
+              >
                 <Trash weight="bold" />
               </IconButton>
             </div>

@@ -57,9 +57,7 @@ export function CreateRequestModal() {
         requests: [...prevState.requests, response.data.request],
       }))
 
-      navigate(
-        `/collections/${collectionId}/requests/${response.data.request.id}`,
-      )
+      navigate(`/collections/${collectionId}/${response.data.request.id}`)
 
       handleCloseModal()
     } finally {

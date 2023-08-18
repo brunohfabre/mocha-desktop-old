@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useController } from 'react-hook-form'
 
 import { Button } from '@/components/Button'
 import { Dropdown } from '@/components/Dropdown'
@@ -7,36 +7,22 @@ import { json } from '@codemirror/lang-json'
 import { CaretDown } from '@phosphor-icons/react'
 import CodeMirror from '@uiw/react-codemirror'
 
-import { RequestType } from '../atoms'
-
-interface BodyProps {
-  request: RequestType
-  onChangeData: (data: Record<string, any>) => void
-}
-
-export function Body({ request, onChangeData }: BodyProps) {
-  const [bodyType, setBodyType] = useState('')
-  const [body, setBody] = useState('')
-
-  useEffect(() => {
-    setBodyType(request.bodyType ?? 'NONE')
-    setBody(request.body ?? '')
-  }, [request])
+export function Body() {
+  const { field: typeField } = useController({
+    name: 'bodyType',
+  })
+  const { field } = useController({
+    name: 'body',
+  })
 
   return (
     <Tabs.Content value="body">
       <div className="flex-1 flex flex-col relative">
-        {bodyType === 'JSON' && (
+        {typeField.value === 'JSON' && (
           <CodeMirror
-            value={body}
+            value={field.value ?? ''}
             extensions={[json()]}
-            onChange={(value) => {
-              onChangeData({
-                body: value,
-              })
-
-              setBody(value)
-            }}
+            onChange={field.onChange}
             className="flex-1 flex overflow-auto"
           />
         )}
@@ -45,31 +31,23 @@ export function Body({ request, onChangeData }: BodyProps) {
           <Dropdown.Root>
             <Dropdown.Trigger>
               <Button type="button">
-                {bodyType} <CaretDown className="ml-2" />
+                {typeField.value} <CaretDown className="ml-2" />
               </Button>
             </Dropdown.Trigger>
 
             <Dropdown.Content align="end">
               <Dropdown.Item
                 onClick={() => {
-                  onChangeData({
-                    bodyType: 'NONE',
-                    body: '',
-                  })
-
-                  setBodyType('NONE')
+                  typeField.onChange('NONE')
+                  field.onChange('')
                 }}
               >
                 NONE
               </Dropdown.Item>
               <Dropdown.Item
                 onClick={() => {
-                  onChangeData({
-                    bodyType: 'JSON',
-                    body: '',
-                  })
-
-                  setBodyType('JSON')
+                  typeField.onChange('JSON')
+                  field.onChange('')
                 }}
               >
                 JSON

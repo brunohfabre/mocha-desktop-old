@@ -1,32 +1,15 @@
-import { useEffect, useState } from 'react'
+import { Controller, useFieldArray } from 'react-hook-form'
 
 import { Button } from '@/components/Button'
 import { IconButton } from '@/components/IconButton'
 import { Tabs } from '@/components/Tabs'
-import { Check, Trash } from '@phosphor-icons/react'
+import { TextInput } from '@/components/TextInput'
+import { Check, Trash, Square } from '@phosphor-icons/react'
 
-import { RequestType } from '../atoms'
-
-type HeaderType = {
-  id: string
-  active: boolean
-  name: string
-  value: string
-}
-
-interface HeadersProps {
-  request: RequestType
-  onChangeData: (data: Record<string, any>) => void
-}
-
-export function Headers({ request, onChangeData }: HeadersProps) {
-  const [headers, setHeaders] = useState<HeaderType[]>([])
-
-  useEffect(() => {
-    setHeaders(
-      request.headers?.map((item) => ({ ...item, id: crypto.randomUUID() })),
-    )
-  }, [request])
+export function Headers() {
+  const { fields, append, remove } = useFieldArray({
+    name: 'headers',
+  })
 
   return (
     <Tabs.Content value="headers">
@@ -35,20 +18,10 @@ export function Headers({ request, onChangeData }: HeadersProps) {
           <Button
             type="button"
             onClick={() => {
-              const value = [
-                ...headers,
-                {
-                  id: crypto.randomUUID(),
-                  active: true,
-                  name: '',
-                  value: '',
-                },
-              ]
-
-              setHeaders(value)
-
-              onChangeData({
-                headers: value,
+              append({
+                active: true,
+                name: '',
+                value: '',
               })
             }}
           >
@@ -57,73 +30,36 @@ export function Headers({ request, onChangeData }: HeadersProps) {
         </div>
 
         <div className="flex flex-col gap-2">
-          {headers.map((header, index) => (
-            <div key={header.id} className="flex gap-2 items-end">
-              <button
-                type="button"
-                className="w-10 h-10 bg-blue-200 flex items-center justify-center"
-                onClick={() => {
-                  const newHeaders = headers.map((item) =>
-                    item.id === header.id
-                      ? { ...item, active: !item.active }
-                      : item,
-                  )
-
-                  setHeaders(newHeaders)
-                  onChangeData({
-                    headers: newHeaders,
-                  })
-                }}
-              >
-                {header.active && <Check size={16} />}
-              </button>
-
-              <input
-                type="text"
-                placeholder="Name"
-                className="flex-1 min-w-[64px] h-10 bg-red-200 px-4"
-                value={header.name}
-                onChange={(event) => {
-                  const value = event.target.value
-
-                  const newHeaders = headers.map((item) =>
-                    item.id === header.id ? { ...item, name: value } : item,
-                  )
-
-                  setHeaders(newHeaders)
-                  onChangeData({
-                    headers: newHeaders,
-                  })
-                }}
+          {fields.map((field, index) => (
+            <div key={field.id} className="flex gap-2 items-end">
+              <Controller
+                name={`headers.${index}.active`}
+                render={({ field: activeField }) => (
+                  <IconButton
+                    type="button"
+                    onClick={() => activeField.onChange(!activeField.value)}
+                  >
+                    {activeField.value ? (
+                      <Check size={16} />
+                    ) : (
+                      <Square size={16} />
+                    )}
+                  </IconButton>
+                )}
               />
 
-              <input
-                type="text"
-                placeholder="Value"
-                className="flex-1 min-w-[64px] h-10 bg-red-200 px-4"
-                value={header.value}
-                onChange={(event) => {
-                  const value = event.target.value
+              <div className="flex-1">
+                <TextInput name={`headers.${index}.name`} placeholder="Name" />
+              </div>
 
-                  const newHeaders = headers.map((item) =>
-                    item.id === header.id ? { ...item, value } : item,
-                  )
+              <div className="flex-1">
+                <TextInput
+                  name={`headers.${index}.value`}
+                  placeholder="Value"
+                />
+              </div>
 
-                  setHeaders(newHeaders)
-                  onChangeData({
-                    headers: newHeaders,
-                  })
-                }}
-              />
-
-              <IconButton
-                type="button"
-                onClick={() =>
-                  setHeaders((prevState) =>
-                    prevState.filter((item) => item.id !== header.id),
-                  )
-                }
-              >
+              <IconButton type="button" onClick={() => remove(index)}>
                 <Trash weight="bold" />
               </IconButton>
             </div>

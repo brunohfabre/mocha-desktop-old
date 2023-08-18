@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import { useAtom } from 'jotai'
 import { z } from 'zod'
@@ -20,6 +21,9 @@ const createRequestFormSchema = z.object({
 type CreateRequestFormData = z.infer<typeof createRequestFormSchema>
 
 export function CreateRequestModal() {
+  const navigate = useNavigate()
+  const { collectionId } = useParams<{ collectionId: string }>()
+
   const createRequestForm = useForm<CreateRequestFormData>({
     resolver: zodResolver(createRequestFormSchema),
   })
@@ -52,6 +56,10 @@ export function CreateRequestModal() {
         ...prevState,
         requests: [...prevState.requests, response.data.request],
       }))
+
+      navigate(
+        `/collections/${collectionId}/requests/${response.data.request.id}`,
+      )
 
       handleCloseModal()
     } finally {

@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, dialog } from 'electron'
+import { app, shell, BrowserWindow } from 'electron'
 import { createFileRoute, createURLRoute } from 'electron-router-dom'
 import path from 'path'
 
@@ -74,10 +74,12 @@ if (!gotTheLock) {
       if (mainWindow.isMinimized()) mainWindow.restore()
       mainWindow.focus()
     }
-    dialog.showErrorBox(
-      'Welcome Back',
-      `You arrived from: ${commandLine.pop()}`,
-    )
+
+    const token = new URL(commandLine.pop() ?? '').searchParams.get('token')
+
+    mainWindow.webContents.send('oauth', {
+      token,
+    })
   })
 
   app.whenReady().then(() => {
